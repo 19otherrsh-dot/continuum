@@ -1,0 +1,34 @@
+{
+  "name": "continuum",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Continuum CRM — an AI-native, automatic-capture CRM",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,worker,web -c cyan,magenta,green \"npm:dev:api\" \"npm:dev:worker\" \"npm:dev:web\"",
+    "dev:api": "npm run dev --workspace core-api",
+    "dev:worker": "npm run dev:worker --workspace core-api",
+    "dev:web": "npm run dev --workspace web",
+    "build": "npm run build --workspace @continuum/shared && npm run build --workspace core-api && npm run build --workspace web",
+    "db:generate": "prisma generate --schema services/core-api/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema services/core-api/prisma/schema.prisma",
+    "db:deploy": "prisma migrate deploy --schema services/core-api/prisma/schema.prisma",
+    "db:reset": "prisma migrate reset --force --schema services/core-api/prisma/schema.prisma",
+    "db:seed": "npm run db:seed --workspace core-api",
+    "db:studio": "prisma studio --schema services/core-api/prisma/schema.prisma",
+    "db:sql": "tsx services/core-api/scripts/generate-schema-sql.ts",
+    "test": "npm run test --workspace core-api",
+    "verify:journeys": "npm run verify:journeys --workspace core-api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prisma": "^6.19.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

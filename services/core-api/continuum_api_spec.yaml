@@ -1,0 +1,1259 @@
+openapi: 3.0.3
+
+# ---------------------------------------------------------------------------
+# Continuum CRM — public API
+#
+# Companion document to the PRD (Appendix B), implementing the endpoints
+# described throughout Part Four.
+#
+# Two properties of this API are deliberate and worth reading before you build
+# against it:
+#
+#   1. Write operations attributed to an AI agent do not exist. The MCP write
+#      tools create *pending proposals* and return their ids; a person confirms
+#      them before anything changes (FR-API-02, §25.5). This is not an
+#      oversight — a trust guarantee that can be bypassed by pointing a
+#      different model at the API is not a guarantee.
+#
+#   2. Data portability is not gated. /settings/exports is available on every
+#      plan with no fee and no tier check (FR-DATA-09).
+# ---------------------------------------------------------------------------
+
+info:
+  title: Continuum CRM API
+  version: '1.0.0'
+  description: |
+    An AI-native CRM that captures customer interactions automatically and
+    proposes the resulting record changes for human confirmation.
+
+    ## Authentication
+
+    All endpoints except signup, login, provider OAuth callbacks and provider
+    webhooks require a bearer token:
+
+        Authorization: Bearer <token>
+
+    Two token types are accepted:
+
+    - **Session JWT** — issued by `/auth/login`, used by the web application.
+    - **API token** — prefixed `ctm_`, created in Settings. Subject to the rate
+      limit below, and revocable with effect on the very next request.
+
+    ## Rate limiting
+
+    API tokens are limited to 300 requests per minute (FR-API-01). Every
+    response carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and
+    `X-RateLimit-Reset`. Requests below the limit are never throttled.
+
+    ## Provenance
+
+    Records that the agent can infer carry a `source` field
+    (`HUMAN` | `AGENT_INFERRED` | `IMPORTED` | `ENRICHED`). Deals additionally
+    carry `stageSource`, recording whether the current stage was set by a
+    person or by a confirmed agent proposal. Consuming clients should surface
+    this distinction rather than flattening it.
+
+  contact:
+    name: Continuum engineering
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:3001/api/v1
+    description: Local development
+  - url: https://api.continuum.example/api/v1
+    description: Production
+
+tags:
+  - name: Auth
+  - name: Contacts
+  - name: Companies
+  - name: Deals
+  - name: Activities
+  - name: Agent Actions
+    description: |
+      The trust surface. Every AI-proposed change lives here as a pending
+      proposal until a person confirms it — optionally after correcting it.
+  - name: Projects
+  - name: Calls
+  - name: Integrations
+  - name: Reports
+  - name: Settings
+  - name: MCP
+    description: |
+      Model Context Protocol interface for external AI agents. Read tools
+      return data; write tools create pending proposals and cannot mutate
+      records.
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/signup:
+    post:
+      tags: [Auth]
+      summary: Create a workspace and its first admin
+      description: |
+        Creates the organization, the admin user, and a usable default pipeline
+        in one call. The motion selected here sets the pipeline template and
+        whether the Project object is visible (FR-PERM-01).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name, organizationName, motion]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                name: { type: string }
+                organizationName: { type: string }
+                motion:
+                  type: string
+                  enum: [SALES, AGENCY, HYBRID]
+      responses:
+        '201':
+          description: Workspace created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Sign in
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Current session and workspace settings
+      responses:
+        '200':
+          description: Session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+                  organization: { $ref: '#/components/schemas/Organization' }
+
+  /contacts:
+    get:
+      tags: [Contacts]
+      summary: List contacts
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
+        - { $ref: '#/components/parameters/Query' }
+        - { $ref: '#/components/parameters/Tag' }
+      responses:
+        '200':
+          description: Contacts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Contact' }
+    post:
+      tags: [Contacts]
+      summary: Create a contact
+      description: |
+        Contacts created here are `source: HUMAN`. A contact whose email domain
+        matches a known company is linked automatically (FR-DATA-03).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContactInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Contact' }
+
+  /contacts/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Contacts]
+      summary: Get a contact
+      responses:
+        '200':
+          description: Contact
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Contact' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Contacts]
+      summary: Update a contact
+      description: Any human edit reclaims the field — `source` becomes `HUMAN`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContactInput' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Contact' }
+    delete:
+      tags: [Contacts]
+      summary: Delete a contact
+      responses:
+        '204': { description: Deleted }
+
+  /contacts/{id}/activities:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Contacts, Activities]
+      summary: Signal Thread for a contact
+      description: The unified chronological timeline (FR-AC-05).
+      responses:
+        '200':
+          description: Activities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Activity' }
+
+  /companies:
+    get:
+      tags: [Companies]
+      summary: List companies
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
+        - { $ref: '#/components/parameters/Query' }
+      responses:
+        '200':
+          description: Companies
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Company' }
+    post:
+      tags: [Companies]
+      summary: Create a company
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                domain: { type: string, nullable: true }
+                website: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Company' }
+
+  /deals:
+    get:
+      tags: [Deals]
+      summary: List deals
+      description: |
+        Scoped by role: members see their own, managers their team's, admins the
+        whole workspace (FR-PERM-03).
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
+        - { $ref: '#/components/parameters/Query' }
+        - name: status
+          in: query
+          schema: { type: string, enum: [OPEN, WON, LOST] }
+        - name: pipelineId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: stageId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Deals
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Deal' }
+    post:
+      tags: [Deals]
+      summary: Create a deal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                pipelineId: { type: string, format: uuid }
+                stageId: { type: string, format: uuid }
+                valueCents: { type: integer, nullable: true }
+                companyId: { type: string, format: uuid, nullable: true }
+                contactIds:
+                  type: array
+                  items: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Deal' }
+
+  /deals/{id}/stage:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Deals]
+      summary: Move a deal to a stage
+      description: |
+        Separate from `PATCH /deals/{id}` so `stageSource` is unambiguously set
+        to `HUMAN` and cannot be changed by accident (FR-PIPE-01). Landing on a
+        won stage sets status to `WON` in the same action, making the deal
+        eligible for project conversion.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stageId]
+              properties:
+                stageId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Moved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Deal' }
+
+  /deals/{id}/activities:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      tags: [Deals, Activities]
+      summary: Signal Thread for a deal
+      responses:
+        '200':
+          description: Activities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Activity' }
+
+  /deals/{id}/convert-to-project:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Deals, Projects]
+      summary: Convert a won deal to a delivery project
+      description: |
+        One atomic action (FR-PROJ-01). The project inherits the company, every
+        stakeholder contact, and the full activity history — the history by
+        re-pointing existing links rather than copying, so capture continues
+        onto the project with no re-linking step (FR-PROJ-03).
+
+        Converting the same deal twice is rejected with a pointer to the
+        existing project (FR-PROJ-06).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                ownerId: { type: string, format: uuid, nullable: true }
+      responses:
+        '201':
+          description: Converted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+        '409':
+          description: Already converted, or the deal is not won
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /activities/notes:
+    post:
+      tags: [Activities]
+      summary: Add a manual note
+      description: |
+        `clientRequestId` makes the write idempotent, so a note composed offline
+        and retried on reconnect syncs exactly once.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body, entityType, entityId]
+              properties:
+                body: { type: string }
+                subject: { type: string, nullable: true }
+                entityType:
+                  type: string
+                  enum: [CONTACT, COMPANY, DEAL, PROJECT, TASK]
+                entityId: { type: string, format: uuid }
+                clientRequestId: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Activity' }
+
+  /agent-actions:
+    get:
+      tags: [Agent Actions]
+      summary: The Agent Action Log
+      description: |
+        Every proposal the system has ever made — confirmed, rejected, and
+        pending alike — with its confidence, the activity that triggered it, and
+        who reviewed it (FR-AGENT-05). Rows are never deleted and never expire.
+
+        Proposals below the workspace confidence threshold are absent because
+        they were never created (FR-AGENT-06): silence is preferred to a
+        low-confidence guess.
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, CONFIRMED, REJECTED, AUTO_APPLIED, FAILED]
+      responses:
+        '200':
+          description: Agent actions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/AgentAction' }
+
+  /agent-actions/pending:
+    get:
+      tags: [Agent Actions]
+      summary: Pending proposals, optionally for one record
+      parameters:
+        - name: entityType
+          in: query
+          schema: { type: string, enum: [CONTACT, COMPANY, DEAL, PROJECT, TASK] }
+        - name: entityId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Pending proposals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/AgentAction' }
+
+  /agent-actions/{id}/confirm:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Agent Actions]
+      summary: Confirm a proposal, optionally correcting it first
+      description: |
+        When `correctedPayload` is present, the corrected value — not the
+        original proposal — is what gets applied (FR-AGENT-03), and the delta is
+        retained as context for future inference on that account (FR-AGENT-04).
+
+        Confirming a proposal whose target was deleted in the interim fails
+        cleanly and marks the action `FAILED` rather than creating an orphaned
+        update.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correctedPayload:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AgentAction' }
+        '409':
+          description: Already resolved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /agent-actions/{id}/reject:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Agent Actions]
+      summary: Reject a proposal
+      description: The row is kept, not deleted — the log is a complete history.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Rejected
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AgentAction' }
+
+  /calls/consent:
+    get:
+      tags: [Calls]
+      summary: Consent regime for a phone number
+      description: |
+        Resolved from country prefix and area code (FR-PIPE-04). Numbers that
+        cannot be classified are treated as all-party: recording someone who did
+        not consent is the failure mode worth designing against.
+      parameters:
+        - name: number
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Consent information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regime: { type: string, enum: [ONE_PARTY, TWO_PARTY, UNKNOWN] }
+                  region: { type: string, nullable: true }
+                  requiresPrompt: { type: boolean }
+                  message: { type: string }
+
+  /calls:
+    post:
+      tags: [Calls]
+      summary: Place a call
+      description: |
+        Dials through the integrated provider without leaving the application
+        (FR-PIPE-03). A call that did not connect is logged as an attempt, never
+        as a conversation, so the pipeline does not read healthier than it is.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contactId]
+              properties:
+                contactId: { type: string, format: uuid }
+                dealId: { type: string, format: uuid, nullable: true }
+                toNumber: { type: string }
+      responses:
+        '201':
+          description: Call placed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activity: { $ref: '#/components/schemas/Activity' }
+                  outcome:
+                    type: string
+                    enum: [CONNECTED, ATTEMPTED_NO_CONNECT, VOICEMAIL, FAILED]
+                  consentRegime: { type: string }
+                  consentPromptPlayed: { type: boolean }
+
+  /integrations/disclosure:
+    get:
+      tags: [Integrations]
+      summary: What connecting a mailbox does and does not capture
+      description: |
+        Shown before consent (FR-AC-01). Stating what is *not* captured is what
+        earns the permission.
+      security: []
+      responses:
+        '200':
+          description: Disclosure
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  captured: { type: array, items: { type: string } }
+                  notCaptured: { type: array, items: { type: string } }
+                  controls: { type: array, items: { type: string } }
+
+  /integrations/{provider}/connect:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+    post:
+      tags: [Integrations]
+      summary: Begin connecting a mailbox
+      description: |
+        One action starts both mail and calendar sync (FR-INT-01, FR-INT-02).
+      responses:
+        '200':
+          description: Authorization URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorizationUrl: { type: string }
+                  state: { type: string }
+                  simulated: { type: boolean }
+
+  /integrations/status:
+    get:
+      tags: [Integrations]
+      summary: Connection health
+      description: |
+        A revoked credential reports `REAUTH_REQUIRED` with a specific,
+        actionable message rather than a generic sync error.
+      responses:
+        '200':
+          description: Connections
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Connection' }
+                  capturedActivities: { type: integer }
+
+  /integrations/sync-now:
+    post:
+      tags: [Integrations]
+      summary: Poll all connections immediately
+      responses:
+        '200':
+          description: Ingestion summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  polled: { type: integer }
+                  created: { type: integer }
+                  updated:
+                    type: integer
+                    description: Rescheduled calendar events updated in place.
+                  duplicates: { type: integer }
+                  filtered:
+                    type: integer
+                    description: Newsletters and automated senders dropped before matching.
+                  excluded: { type: integer }
+
+  /reports/dashboard:
+    get:
+      tags: [Reports]
+      summary: Default dashboard
+      description: Renders with no configuration (FR-REPORT-01).
+      responses:
+        '200':
+          description: Dashboard
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Dashboard' }
+
+  /reports/success-metrics:
+    get:
+      tags: [Reports]
+      summary: KPI framework
+      description: |
+        The success metrics with their targets, computed from product
+        instrumentation. Retention is named but not computed — it comes from the
+        billing system, not from product events.
+      responses:
+        '200':
+          description: Metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt: { type: string, format: date-time }
+                  goals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        goal: { type: string }
+                        metric: { type: string }
+                        target: { type: number }
+                        unit: { type: string }
+                        value: { type: number, nullable: true }
+                        meetsTarget: { type: boolean }
+                        detail: { type: string }
+
+  /reports/autonomy-policy:
+    get:
+      tags: [Reports, Agent Actions]
+      summary: The workspace's autonomy stance
+      description: |
+        At V1 this always reports that every action requires confirmation,
+        regardless of the workspace opt-in flag (§25.5).
+      responses:
+        '200':
+          description: Policy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  phase: { type: integer }
+                  headline: { type: string }
+                  detail: { type: string }
+                  workspaceOptedIn: { type: boolean }
+                  everyActionRequiresConfirmation: { type: boolean }
+
+  /search:
+    get:
+      tags: [Reports]
+      summary: Global search
+      description: |
+        Ranked across contacts, companies, deals and projects — including terms
+        that appear only inside a captured activity's summary or body
+        (FR-SEARCH-01, FR-SEARCH-02).
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 2 }
+      responses:
+        '200':
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        entityType: { type: string }
+                        id: { type: string, format: uuid }
+                        title: { type: string }
+                        subtitle: { type: string, nullable: true }
+                        score: { type: number }
+
+  /settings/exports:
+    get:
+      tags: [Settings]
+      summary: List export jobs
+      responses:
+        '200':
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { type: object } }
+    post:
+      tags: [Settings]
+      summary: Export the entire workspace
+      description: |
+        Every object type, in JSON and CSV, with a manifest describing the
+        format. Agent-inferred values are included and tagged, so the export is
+        exactly as trustworthy as the in-app record.
+
+        **No plan-tier restriction and no usage fee, at any tier** (FR-DATA-09).
+      responses:
+        '202':
+          description: Export queued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  status: { type: string, enum: [QUEUED, RUNNING, READY, FAILED] }
+
+  /settings/api-tokens:
+    get:
+      tags: [Settings]
+      summary: List API tokens
+      responses:
+        '200':
+          description: Tokens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { type: object } }
+    post:
+      tags: [Settings]
+      summary: Create an API token
+      description: The plaintext token is returned once and never stored.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  name: { type: string }
+                  token:
+                    type: string
+                    description: Shown once. Store it now.
+                  prefix: { type: string }
+
+  /settings/api-tokens/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    delete:
+      tags: [Settings]
+      summary: Revoke an API token
+      description: Takes effect on the very next request (FR-API-04).
+      responses:
+        '204': { description: Revoked }
+
+  /mcp/tools:
+    get:
+      tags: [MCP]
+      summary: Available MCP tools
+      responses:
+        '200':
+          description: Tool definitions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tools: { type: array, items: { type: object } }
+                  note: { type: string }
+
+  /mcp/call:
+    post:
+      tags: [MCP]
+      summary: Invoke an MCP tool
+      description: |
+        Read tools (`search_records`, `get_deal`, `list_activities`,
+        `list_pipeline`) return data directly.
+
+        **Write tools do not mutate records.** `propose_stage_change` and
+        `propose_contact` create a pending Agent Action and return its id, so an
+        external agent passes through the same human confirmation gate as
+        Continuum's own agent (FR-API-02). A proposal below the workspace
+        confidence threshold is discarded rather than recorded.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                arguments:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Tool result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    description: |
+                      Shape depends on the tool. Write tools return
+                      `{ created, proposalId, status, message }`.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: A session JWT, or a `ctm_`-prefixed API token.
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    PageSize:
+      name: pageSize
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+    Query:
+      name: q
+      in: query
+      schema: { type: string }
+    Tag:
+      name: tag
+      in: query
+      schema: { type: string }
+
+  responses:
+    Unauthorized:
+      description: Missing, invalid, or revoked credentials
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: No such record
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: Conflicts with current state
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Stable machine-readable code — branch on this, not on the message.
+            message: { type: string }
+            details: {}
+
+    Paginated:
+      type: object
+      properties:
+        total: { type: integer }
+        page: { type: integer }
+        pageSize: { type: integer }
+
+    RecordSource:
+      type: string
+      description: |
+        Where a value came from. Clients should surface this distinction — an
+        agent-inferred value must never be presented as indistinguishable from
+        one a person typed (FR-DATA-02).
+      enum: [HUMAN, AGENT_INFERRED, IMPORTED, ENRICHED]
+
+    AuthResult:
+      type: object
+      properties:
+        token: { type: string }
+        user: { $ref: '#/components/schemas/User' }
+        organization: { $ref: '#/components/schemas/Organization' }
+
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        name: { type: string }
+        role: { type: string, enum: [ADMIN, MANAGER, MEMBER] }
+        teamId: { type: string, format: uuid, nullable: true }
+
+    Organization:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        motion: { type: string, enum: [SALES, AGENCY, HYBRID] }
+        showProjectsUi:
+          type: boolean
+          description: |
+            False for sales-only workspaces, where the Project object is hidden
+            entirely rather than shown empty (FR-PROJ-05).
+        stallingThresholdDays: { type: integer }
+        agentHighThreshold: { type: number }
+        agentMediumThreshold:
+          type: number
+          description: Proposals below this are never created at all.
+
+    Company:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        domain: { type: string, nullable: true }
+        source: { $ref: '#/components/schemas/RecordSource' }
+        tags: { type: array, items: { type: string } }
+
+    Contact:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        firstName: { type: string, nullable: true }
+        lastName: { type: string, nullable: true }
+        fullName: { type: string }
+        title: { type: string, nullable: true }
+        companyId: { type: string, format: uuid, nullable: true }
+        source: { $ref: '#/components/schemas/RecordSource' }
+        excluded:
+          type: boolean
+          description: Capture is switched off for this sender (FR-AC-08).
+
+    ContactInput:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email }
+        firstName: { type: string, nullable: true }
+        lastName: { type: string, nullable: true }
+        title: { type: string, nullable: true }
+        companyId: { type: string, format: uuid, nullable: true }
+        tags: { type: array, items: { type: string } }
+
+    Deal:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        pipelineId: { type: string, format: uuid }
+        stageId: { type: string, format: uuid }
+        stageSource:
+          allOf: [{ $ref: '#/components/schemas/RecordSource' }]
+          description: |
+            Stored separately from `stageId` so the UI can always answer
+            "human or agent?" without inspecting the audit log.
+        status: { type: string, enum: [OPEN, WON, LOST] }
+        valueCents: { type: integer, nullable: true }
+        lastActivityAt: { type: string, format: date-time, nullable: true }
+        stallingSince:
+          type: string
+          format: date-time
+          nullable: true
+          description: Non-null while past the workspace inactivity threshold (FR-AC-06).
+        convertedProjectId: { type: string, format: uuid, nullable: true }
+        needsReview:
+          type: boolean
+          description: |
+            Set when a converted deal was reopened — the relationship is flagged
+            for a human rather than silently reverted.
+
+    Activity:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        type: { type: string, enum: [EMAIL, CALL, MEETING, NOTE] }
+        direction: { type: string, enum: [INBOUND, OUTBOUND, INTERNAL] }
+        subject: { type: string, nullable: true }
+        body:
+          type: string
+          nullable: true
+          description: |
+            An excerpt, not the full message. Continuum stores enough to audit
+            the summary against; the complete text stays in the user's mailbox
+            (data minimization, §30).
+        occurredAt: { type: string, format: date-time }
+        aiSummary:
+          type: string
+          nullable: true
+          description: Null whenever summarization has not succeeded — never fabricated.
+        sentiment:
+          type: string
+          nullable: true
+          enum: [POSITIVE, NEUTRAL, NEGATIVE]
+        nextStep:
+          type: string
+          nullable: true
+          description: |
+            Explicitly nullable. "No next step" is representable, so the model is
+            never forced to invent one (FR-AC-03).
+        summaryStatus: { type: string, enum: [PENDING, DONE, FAILED, SKIPPED] }
+        callOutcome:
+          type: string
+          nullable: true
+          enum: [CONNECTED, ATTEMPTED_NO_CONNECT, VOICEMAIL, FAILED]
+        source: { $ref: '#/components/schemas/RecordSource' }
+
+    AgentAction:
+      type: object
+      description: |
+        A proposed change. Distinct from an Activity: an Activity records what
+        happened, an AgentAction records what the AI proposed to do about it.
+      properties:
+        id: { type: string, format: uuid }
+        type:
+          type: string
+          enum:
+            [
+              CREATE_CONTACT,
+              UPDATE_CONTACT,
+              CREATE_COMPANY,
+              CHANGE_DEAL_STAGE,
+              UPDATE_DEAL,
+              CREATE_TASK,
+              LINK_CONTACT_TO_DEAL,
+            ]
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, REJECTED, AUTO_APPLIED, FAILED]
+          description: |
+            `AUTO_APPLIED` is unreachable at V1 — every proposal requires human
+            confirmation (§25.5).
+        targetEntityType: { type: string }
+        targetEntityId: { type: string, format: uuid, nullable: true }
+        proposedPayload: { type: object, additionalProperties: true }
+        appliedPayload:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: |
+            What was actually written. Differs from `proposedPayload` when the
+            user corrected the proposal before accepting it.
+        confidenceScore:
+          type: number
+          description: |
+            Present for auditing. Clients should render the qualitative `tier`
+            rather than this figure — a bare percentage implies a precision the
+            model does not have (§25.3).
+        tier: { type: string, enum: [HIGH, MEDIUM] }
+        rationale: { type: string, nullable: true }
+        sourceActivityId: { type: string, format: uuid, nullable: true }
+        reviewedByName: { type: string, nullable: true }
+        reviewedAt: { type: string, format: date-time, nullable: true }
+
+    Project:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        status: { type: string, enum: [ACTIVE, ON_HOLD, COMPLETED, CANCELLED] }
+        companyId: { type: string, format: uuid, nullable: true }
+        originatingDealId: { type: string, format: uuid, nullable: true }
+        milestones: { type: array, items: { type: object } }
+
+    Connection:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        provider: { type: string, enum: [GOOGLE, MICROSOFT, SLACK, TELEPHONY, ESIGN] }
+        status:
+          type: string
+          enum: [CONNECTED, ERROR, REAUTH_REQUIRED, DISCONNECTED]
+          description: |
+            `ERROR` is transient and retried with backoff; `REAUTH_REQUIRED`
+            needs the user to act and stops polling until they do.
+        accountEmail: { type: string, nullable: true }
+        lastSyncedAt: { type: string, format: date-time, nullable: true }
+        needsAttention: { type: boolean }
+        message: { type: string, nullable: true }
+
+    Dashboard:
+      type: object
+      properties:
+        pipelineValueByStage:
+          type: array
+          items:
+            type: object
+            properties:
+              stageId: { type: string, format: uuid }
+              stageName: { type: string }
+              count: { type: integer }
+              valueCents: { type: integer }
+        wonCount: { type: integer }
+        lostCount: { type: integer }
+        captureCoverage:
+          type: object
+          description: |
+            The share of open deals with recent captured activity — the metric
+            that answers "can I trust the rest of this screen?" (FR-REPORT-04).
+          properties:
+            totalOpenDeals: { type: integer }
+            withRecentActivity: { type: integer }
+            percentage: { type: integer }
+        stallingDeals: { type: integer }
+        pendingAgentActions: { type: integer }
+        autoCapturedShare: { type: integer }

@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: continuum_postgres
+    environment:
+      POSTGRES_USER: continuum
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: continuum
+    ports:
+      # 5434 to avoid colliding with other local Postgres instances
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U continuum -d continuum"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: continuum_redis
+    ports:
+      - "6380:6379"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

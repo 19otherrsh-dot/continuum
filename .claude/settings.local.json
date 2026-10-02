@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npm install --no-audit --no-fund 2>&1)",
+      "PowerShell(Copy-Item .env.example .env)",
+      "PowerShell(npx prisma validate --schema services/core-api/prisma/schema.prisma 2>&1)",
+      "PowerShell($dd = \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\"; if \\(Test-Path $dd\\) { Start-Process $dd; Write-Output \"Docker Desktop launching...\" } else { Write-Output \"Docker Desktop not found at $dd\" })",
+      "PowerShell($src=\"d:\\\\Antigravity\\\\Continuum\"; Select-String -Path \"$src\\\\README.md\" -Pattern \"FR-|Deferred|Not implemented|not built\" -AllMatches | ForEach-Object { \"$\\($_.LineNumber\\): $\\($_.Line.Trim\\(\\)\\)\" })"
+    ]
+  }
+}

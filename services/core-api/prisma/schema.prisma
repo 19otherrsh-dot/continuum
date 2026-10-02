@@ -1,0 +1,957 @@
+// ---------------------------------------------------------------------------
+// Continuum CRM — data model
+//
+// Design intent (PRD Part Five, §24). Two properties distinguish this schema
+// from a CRM that had AI retrofitted onto it, and both must survive future
+// changes:
+//
+//   1. Provenance is first-class. Every field the agent can infer carries a
+//      `source`. `Deal.stageSource` is stored separately from `stageId` so the
+//      UI can always answer "did a human or the agent make this call?" without
+//      audit-log archaeology. Adding this later would mean backfilling every
+//      historical row.
+//
+//   2. Activity and AgentAction are separate, structured objects. An Activity
+//      records *what happened*; an AgentAction records *what the AI proposed to
+//      do about it*. Because Activity is structured rather than a log line, the
+//      timeline is queryable in ways an append-only activity feed is not.
+// ---------------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------- enums ----------------------------------------
+
+enum RecordSource {
+  HUMAN
+  AGENT_INFERRED
+  IMPORTED
+  ENRICHED
+}
+
+enum WorkspaceMotion {
+  SALES
+  AGENCY
+  HYBRID
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+}
+
+enum ActivityType {
+  EMAIL
+  CALL
+  MEETING
+  NOTE
+}
+
+enum ActivityDirection {
+  INBOUND
+  OUTBOUND
+  INTERNAL
+}
+
+enum SummaryStatus {
+  PENDING
+  DONE
+  FAILED
+  SKIPPED
+}
+
+enum Sentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+enum CallOutcome {
+  CONNECTED
+  ATTEMPTED_NO_CONNECT
+  VOICEMAIL
+  FAILED
+}
+
+enum EntityType {
+  CONTACT
+  COMPANY
+  DEAL
+  PROJECT
+  TASK
+}
+
+enum AgentActionType {
+  CREATE_CONTACT
+  UPDATE_CONTACT
+  CREATE_COMPANY
+  CHANGE_DEAL_STAGE
+  UPDATE_DEAL
+  CREATE_TASK
+  LINK_CONTACT_TO_DEAL
+}
+
+enum AgentActionStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  // Reserved for the Phase 2/3 limited-autonomy model. Unreachable at V1 —
+  // present so enabling it needs no migration.
+  AUTO_APPLIED
+  FAILED
+}
+
+enum ConfidenceTier {
+  HIGH
+  MEDIUM
+}
+
+enum IntegrationProvider {
+  GOOGLE
+  MICROSOFT
+  SLACK
+  TELEPHONY
+  ESIGN
+}
+
+enum ConnectionStatus {
+  CONNECTED
+  ERROR
+  REAUTH_REQUIRED
+  DISCONNECTED
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskStatus {
+  OPEN
+  COMPLETED
+  CANCELLED
+}
+
+enum ExclusionKind {
+  SENDER
+  DOMAIN
+  THREAD
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  DATE
+  BOOLEAN
+  SELECT
+}
+
+enum ActorType {
+  HUMAN
+  AGENT
+  SYSTEM
+}
+
+enum ExportStatus {
+  QUEUED
+  RUNNING
+  READY
+  FAILED
+}
+
+enum NotificationType {
+  DEAL_STALLING
+  AGENT_ACTION_PENDING
+  NEW_LEAD
+  CONNECTION_REAUTH
+  DEAL_WON
+  PROJECT_REVIEW
+}
+
+// --------------------------- tenancy --------------------------------------
+
+/// The tenancy boundary. Every other model carries `organizationId`, and the
+/// Prisma client extension in src/db/client.ts injects that filter on every
+/// query so no route can forget it. Postgres RLS policies ship alongside in
+/// migrations/ and can be enabled before production.
+model Organization {
+  id             String          @id @default(uuid())
+  name           String
+  motion         WorkspaceMotion @default(SALES)
+  /// Agency/Hybrid workspaces see the Project object; Sales-only workspaces
+  /// have it hidden entirely from navigation (FR-PROJ-05).
+  showProjectsUi Boolean         @default(false)
+
+  /// Days of no captured activity before a deal is flagged stalling (FR-AC-06).
+  stallingThresholdDays Int   @default(5)
+  /// Confidence gates for agent proposals (PRD §25.1). Below the medium
+  /// threshold no AgentAction is created at all.
+  agentHighThreshold    Float @default(0.8)
+  agentMediumThreshold  Float @default(0.5)
+
+  // Transparent, non-metered pricing — every line is explainable (FR-ADMIN-01).
+  planName          String @default("Team")
+  seatCount         Int    @default(1)
+  pricePerSeatCents Int    @default(3900)
+
+  /// Envelope encryption: a per-organization data key, itself encrypted under
+  /// the application's master key. Provider credentials are sealed with this
+  /// rather than with a single static application secret, so rotating one
+  /// tenant's key — or containing one tenant's compromise — does not require
+  /// touching everyone else's data (schema.sql production-hardening note).
+  encryptedDataKey String?
+
+  /// Phase 2+ opt-in for auto-applying the lowest-consequence suggestions.
+  /// Unreachable at V1: the autonomy policy in src/ai/autonomy.ts refuses
+  /// regardless of this flag until the phase gate moves.
+  autoApplyOptIn Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users        User[]
+  teams        Team[]
+  pipelines    Pipeline[]
+  companies    Company[]
+  contacts     Contact[]
+  deals        Deal[]
+  activities   Activity[]
+  agentActions AgentAction[]
+  corrections  AgentCorrection[]
+  projects     Project[]
+  tasks        Task[]
+  connections  IntegrationConnection[]
+  exclusions   CaptureExclusion[]
+  customFields CustomFieldDef[]
+  tags         Tag[]
+  auditLogs    AuditLog[]
+  notification Notification[]
+  apiTokens    ApiToken[]
+  exportJobs   ExportJob[]
+  proposals    Proposal[]
+  fieldPerms   FieldPermission[]
+  analytics    AnalyticsEvent[]
+}
+
+/// Product analytics (PRD §38).
+///
+/// Deliberately a separate table from the CRM records it describes, so it can
+/// be retained on its own schedule and so no query against it can surface a
+/// customer's communications. `properties` holds IDs, enums and durations
+/// only — never message content (§38.1).
+model AnalyticsEvent {
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String?
+  name           String
+  properties     Json     @default("{}")
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, name, createdAt])
+  @@index([name, createdAt])
+}
+
+model Team {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members      User[]
+
+  @@index([organizationId])
+}
+
+model User {
+  id             String   @id @default(uuid())
+  organizationId String
+  email          String
+  passwordHash   String
+  name           String
+  role           UserRole @default(MEMBER)
+  teamId         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization      Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team              Team?                   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  ownedDeals        Deal[]                  @relation("DealOwner")
+  ownedProjects     Project[]               @relation("ProjectOwner")
+  ownedTasks        Task[]                  @relation("TaskOwner")
+  ownedMilestones   Milestone[]             @relation("MilestoneOwner")
+  reviewedActions   AgentAction[]           @relation("AgentActionReviewer")
+  corrections       AgentCorrection[]
+  connections       IntegrationConnection[]
+  notifications     Notification[]
+  exportJobs        ExportJob[]
+
+  @@unique([organizationId, email])
+  @@index([organizationId])
+  @@index([teamId])
+}
+
+// --------------------------- pipeline -------------------------------------
+
+/// Multi-pipeline support is core architecture from V1, not an Enterprise-tier
+/// gate added later — this is the "no graduation cliff" commitment (FR-PERM-04).
+model Pipeline {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  isDefault      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  stages       Stage[]
+  deals        Deal[]
+
+  @@index([organizationId])
+}
+
+model Stage {
+  id             String  @id @default(uuid())
+  pipelineId     String
+  name           String
+  order          Int
+  winProbability Float   @default(0)
+  isWonStage     Boolean @default(false)
+  isLostStage    Boolean @default(false)
+
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  deals    Deal[]
+
+  @@unique([pipelineId, order])
+  @@index([pipelineId])
+}
+
+// --------------------------- core records ---------------------------------
+
+model Company {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  /// Domain is the join key the matching engine uses to attach captured email
+  /// to an account, so it is unique per workspace.
+  domain         String?
+  website        String?
+  source         RecordSource @default(HUMAN)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contacts     Contact[]
+  deals        Deal[]
+  projects     Project[]
+  corrections  AgentCorrection[]
+
+  @@unique([organizationId, domain])
+  @@index([organizationId])
+  @@index([organizationId, name])
+}
+
+model Contact {
+  id             String       @id @default(uuid())
+  organizationId String
+  companyId      String?
+  email          String
+  firstName      String?
+  lastName       String?
+  phone          String?
+  title          String?
+  source         RecordSource @default(HUMAN)
+  /// Set when a user excludes this sender from capture (FR-AC-08).
+  excluded       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  company      Company?              @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  deals        DealContact[]
+  projects     ProjectContact[]
+  activities   ActivityParticipant[]
+
+  @@unique([organizationId, email])
+  @@index([organizationId])
+  @@index([companyId])
+}
+
+model Deal {
+  id             String       @id @default(uuid())
+  organizationId String
+  pipelineId     String
+  stageId        String
+  /// Deliberately distinct from `stageId`: the UI must be able to show whether
+  /// the current stage was set by a person or by a confirmed agent proposal.
+  stageSource    RecordSource @default(HUMAN)
+  name           String
+  status         DealStatus   @default(OPEN)
+  valueCents     Int?
+  currency       String       @default("USD")
+  ownerId        String?
+  companyId      String?
+  source         RecordSource @default(HUMAN)
+
+  expectedCloseDate DateTime?
+  /// Timestamp of the most recent linked Activity. Denormalised because the
+  /// stalling sweep and capture-coverage metric both read it on every deal.
+  lastActivityAt    DateTime?
+  /// Non-null while the deal is past the workspace's inactivity threshold.
+  stallingSince     DateTime?
+  closedAt          DateTime?
+
+  /// Set when a reopened deal already has a Project. The relationship is
+  /// flagged for a human rather than silently reverted (Epic D edge case).
+  needsReview  Boolean @default(false)
+  reviewReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pipeline     Pipeline      @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  stage        Stage         @relation(fields: [stageId], references: [id])
+  owner        User?         @relation("DealOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  company      Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  contacts     DealContact[]
+  project      Project?
+  proposals    Proposal[]
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([stageId])
+  @@index([companyId])
+  @@index([ownerId])
+  // Board load: open deals for one pipeline, ordered as the UI renders them.
+  // Composite so a 50k-record workspace serves the Kanban from an index scan
+  // rather than a filtered sort (§29, sub-second target).
+  @@index([organizationId, pipelineId, status, updatedAt])
+  // The stalling sweep and capture-coverage metric both scan on this pair.
+  @@index([organizationId, status, lastActivityAt])
+  @@index([organizationId, stallingSince])
+}
+
+/// Multi-stakeholder deals, each optionally tagged with a role such as
+/// "decision maker" or "champion" (FR-DATA-05).
+model DealContact {
+  dealId    String
+  contactId String
+  role      String?
+  createdAt DateTime @default(now())
+
+  deal    Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([dealId, contactId])
+  @@index([contactId])
+}
+
+// --------------------------- activity -------------------------------------
+
+/// The most architecturally significant object in the schema. Treated as a
+/// structured record — type, participants, summary, sentiment, next step —
+/// rather than a secondary log line. This is why the Continuum timeline is
+/// queryable in ways an incumbent's activity feed is not.
+model Activity {
+  id             String            @id @default(uuid())
+  organizationId String
+  type           ActivityType
+  direction      ActivityDirection @default(INBOUND)
+  subject        String?
+  body           String?
+  occurredAt     DateTime
+  source         RecordSource      @default(HUMAN)
+
+  /// Provider-side identifier. Doubles as the idempotency key for calendar
+  /// events, which are updated in place on reschedule rather than duplicated.
+  externalRef  String?
+  connectionId String?
+  threadRef    String?
+
+  // --- call-specific ---
+  durationSeconds Int?
+  callOutcome     CallOutcome?
+  recordingUrl    String?
+  transcript      String?
+  externalCallId  String?
+
+  /// Full message text, held only until summarization consumes it, then set
+  /// back to null. `body` keeps a short excerpt permanently (§30 data
+  /// minimization); this column exists so decoupling enrichment from the poll
+  /// loop does not cost summary quality on long threads. Nothing reads it
+  /// after `summaryStatus` leaves PENDING.
+  rawBodyTransient String?
+
+  // --- AI-derived, all nullable ---
+  /// Null until summarization succeeds. The Activity write never blocks on the
+  /// AI step, so a summarizer outage costs a summary, not a record (FR-AC-03).
+  aiSummary     String?
+  sentiment     Sentiment?
+  /// Explicitly nullable — "no next step" is representable, so the model is
+  /// never forced to invent one.
+  nextStep      String?
+  summaryStatus SummaryStatus @default(PENDING)
+  summaryError  String?
+
+  createdAt DateTime @default(now())
+
+  organization Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  connection   IntegrationConnection? @relation(fields: [connectionId], references: [id], onDelete: SetNull)
+  participants ActivityParticipant[]
+  links        ActivityLink[]
+  agentActions AgentAction[]
+
+  @@unique([connectionId, externalRef])
+  @@index([organizationId, occurredAt])
+  @@index([organizationId, summaryStatus])
+  @@index([threadRef])
+  // Thread continuation lookup in the matching engine — hit on every ingested
+  // message, so it must not degrade as the activity table grows.
+  @@index([organizationId, threadRef, occurredAt])
+  @@index([externalCallId])
+  // The enrichment worker claims pending work across all tenants, oldest first.
+  @@index([summaryStatus, createdAt])
+}
+
+model ActivityParticipant {
+  activityId String
+  contactId  String
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  contact  Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([activityId, contactId])
+  @@index([contactId])
+}
+
+/// Polymorphic attachment. Because links are rows rather than a foreign key on
+/// Activity, converting a won Deal to a Project just re-points these — the
+/// client's whole history follows with no re-linking step (FR-PROJ-03).
+model ActivityLink {
+  id         String     @id @default(uuid())
+  activityId String
+  entityType EntityType
+  entityId   String
+  isPrimary  Boolean    @default(false)
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@unique([activityId, entityType, entityId])
+  // Every record timeline resolves through this index.
+  @@index([entityType, entityId])
+  @@index([activityId])
+}
+
+/// Idempotency ledger for provider deliveries. A message returned twice by a
+/// retried poll must not create a second Activity (FR-AC-09).
+model ProcessedMessage {
+  id           String   @id @default(uuid())
+  connectionId String
+  externalRef  String
+  processedAt  DateTime @default(now())
+
+  connection IntegrationConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, externalRef])
+  @@index([connectionId])
+}
+
+// --------------------------- agent ----------------------------------------
+
+/// Distinct from Activity: an Activity records what happened, an AgentAction
+/// records what the AI proposed to do about it. Rows are never deleted and
+/// never silently expire — the log is the observability guarantee (FR-AGENT-05).
+model AgentAction {
+  id               String            @id @default(uuid())
+  organizationId   String
+  type             AgentActionType
+  status           AgentActionStatus @default(PENDING)
+  targetEntityType EntityType
+  targetEntityId   String?
+  proposedPayload  Json
+  /// What was actually written on confirm. Differs from `proposedPayload`
+  /// whenever the user corrected the proposal before accepting it.
+  appliedPayload   Json?
+  confidenceScore  Float
+  tier             ConfidenceTier
+  rationale        String?
+  sourceActivityId String?
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  failureReason    String?
+  createdAt        DateTime          @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sourceActivity Activity?    @relation(fields: [sourceActivityId], references: [id], onDelete: SetNull)
+  reviewedBy     User?        @relation("AgentActionReviewer", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([organizationId, createdAt])
+  @@index([targetEntityType, targetEntityId])
+}
+
+/// A user's correction to an inferred value, retained and fed back as context
+/// for future inference on the same account. This is the account-specific data
+/// moat described in the Landscape report (FR-AGENT-04).
+model AgentCorrection {
+  id             String   @id @default(uuid())
+  organizationId String
+  companyId      String?
+  actionType     String
+  fieldPath      String
+  originalValue  String?
+  correctedValue String?
+  correctedById  String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  company      Company?     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  correctedBy  User?        @relation(fields: [correctedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, companyId])
+}
+
+// --------------------------- delivery -------------------------------------
+
+/// Optional object, surfaced only for Agency/Hybrid workspaces. Linked to the
+/// Deal it came from rather than being a separate product.
+model Project {
+  id             String        @id @default(uuid())
+  organizationId String
+  name           String
+  status         ProjectStatus @default(ACTIVE)
+  companyId      String?
+  ownerId        String?
+  /// Unique: the database itself rejects converting the same deal twice
+  /// (FR-PROJ-06), rather than relying on an application-level check.
+  originatingDealId String?    @unique
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  company         Company?         @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  owner           User?            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  originatingDeal Deal?            @relation(fields: [originatingDealId], references: [id], onDelete: SetNull)
+  milestones      Milestone[]
+  contacts        ProjectContact[]
+
+  @@index([organizationId, status])
+  @@index([companyId])
+  @@index([ownerId])
+}
+
+model ProjectContact {
+  projectId String
+  contactId String
+  role      String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, contactId])
+  @@index([contactId])
+}
+
+model Milestone {
+  id          String    @id @default(uuid())
+  projectId   String
+  title       String
+  ownerId     String?
+  dueDate     DateTime?
+  completedAt DateTime?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  owner   User?   @relation("MilestoneOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+}
+
+model Task {
+  id             String       @id @default(uuid())
+  organizationId String
+  title          String
+  notes          String?
+  dueAt          DateTime?
+  ownerId        String?
+  status         TaskStatus   @default(OPEN)
+  /// Survives status changes, so a completed agent-created task is still
+  /// identifiable as agent-created.
+  source         RecordSource @default(HUMAN)
+  entityType     EntityType?
+  entityId       String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner        User?        @relation("TaskOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([ownerId])
+}
+
+// --------------------------- integrations ---------------------------------
+
+model IntegrationConnection {
+  id             String              @id @default(uuid())
+  organizationId String
+  userId         String?
+  provider       IntegrationProvider
+  status         ConnectionStatus    @default(CONNECTED)
+  accountEmail   String?
+
+  /// Encrypted at rest with TOKEN_ENCRYPTION_KEY (AES-256-GCM).
+  accessToken  String?
+  refreshToken String?
+  expiresAt    DateTime?
+
+  /// Provider cursor for incremental sync (Gmail historyId, Graph deltaLink).
+  syncCursor     String?
+  calendarCursor String?
+  lastSyncedAt   DateTime?
+
+  // Per-connection backoff. One provider rate-limiting an account must never
+  // stall ingestion for any other connection (FR-AC-07).
+  nextPollAt     DateTime @default(now())
+  backoffSeconds Int      @default(60)
+  failureCount   Int      @default(0)
+  lastError      String?
+
+  backfillCompletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user              User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  activities        Activity[]
+  processedMessages ProcessedMessage[]
+  exclusions        CaptureExclusion[]
+
+  @@index([organizationId])
+  @@index([status, nextPollAt])
+}
+
+/// User-controlled capture exclusions. Excluded content is never ingested,
+/// summarized, or transiently sent to the model (FR-AC-08). Scoped per
+/// connection, because a user may have a personal and a work account with
+/// different rules.
+model CaptureExclusion {
+  id             String        @id @default(uuid())
+  organizationId String
+  connectionId   String?
+  kind           ExclusionKind
+  value          String
+  createdAt      DateTime      @default(now())
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  connection   IntegrationConnection? @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, connectionId, kind, value])
+  @@index([organizationId])
+}
+
+/// Proposal sent for signature. The adapter and send flow ship at V1;
+/// automatic status reflection on the Deal is FR-INT-04 (P1).
+model Proposal {
+  id              String    @id @default(uuid())
+  organizationId  String
+  dealId          String
+  title           String
+  body            String
+  signerContactId String?
+  externalRef     String?
+  status          String    @default("DRAFT")
+  sentAt          DateTime?
+  signedAt        DateTime?
+  createdAt       DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deal         Deal         @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([dealId])
+}
+
+// --------------------------- extensibility --------------------------------
+
+/// Generic, entity-typed custom attributes rather than per-customer schema
+/// migrations. New fields are available immediately with no engineering
+/// involvement (FR-DATA-04).
+model CustomFieldDef {
+  id             String          @id @default(uuid())
+  organizationId String
+  entityType     EntityType
+  key            String
+  label          String
+  type           CustomFieldType @default(TEXT)
+  options        String[]        @default([])
+  /// Soft-deleted rather than dropped: recorded values are retained so exports
+  /// stay complete without a destructive migration (Epic B edge case).
+  archivedAt     DateTime?
+  createdAt      DateTime        @default(now())
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  values       CustomFieldValue[]
+
+  @@unique([organizationId, entityType, key])
+  @@index([organizationId])
+}
+
+model CustomFieldValue {
+  id         String   @id @default(uuid())
+  defId      String
+  entityId   String
+  value      Json
+  updatedAt  DateTime @updatedAt
+
+  def CustomFieldDef @relation(fields: [defId], references: [id], onDelete: Cascade)
+
+  @@unique([defId, entityId])
+  @@index([entityId])
+}
+
+model Tag {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  color          String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  taggings     Tagging[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model Tagging {
+  tagId      String
+  entityType EntityType
+  entityId   String
+
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([tagId, entityType, entityId])
+  @@index([entityType, entityId])
+}
+
+/// Every change — human or agent-originated — with actor, timestamp and prior
+/// value (FR-DATA-07). Concurrent writes are last-write-wins at the database
+/// layer, but the conflict stays visible here rather than being silently
+/// resolved.
+model AuditLog {
+  id             String     @id @default(uuid())
+  organizationId String
+  actorType      ActorType
+  actorId        String?
+  actorName      String?
+  entityType     EntityType
+  entityId       String
+  field          String
+  priorValue     String?
+  newValue       String?
+  createdAt      DateTime   @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+  @@index([entityType, entityId])
+}
+
+/// Schema-only at V1. The capability exists in the data model so a future
+/// field-level permission UI needs no migration (FR-PERM-05).
+model FieldPermission {
+  id             String     @id @default(uuid())
+  organizationId String
+  entityType     EntityType
+  field          String
+  role           UserRole
+  canRead        Boolean    @default(true)
+  canWrite       Boolean    @default(true)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, entityType, field, role])
+}
+
+// --------------------------- platform -------------------------------------
+
+model Notification {
+  id             String           @id @default(uuid())
+  organizationId String
+  userId         String
+  type           NotificationType
+  title          String
+  body           String?
+  /// Suppresses repeats of the same underlying event. Its own column with a
+  /// unique index — previously this was smuggled through `body`, which meant
+  /// any notification that also carried human-readable text silently lost its
+  /// deduplication.
+  dedupeKey      String?
+  entityType     EntityType?
+  entityId       String?
+  readAt         DateTime?
+  createdAt      DateTime         @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, readAt])
+}
+
+model ApiToken {
+  id             String    @id @default(uuid())
+  organizationId String
+  name           String
+  /// Only the hash is stored; the plaintext is shown once at creation.
+  tokenHash      String    @unique
+  tokenPrefix    String
+  lastUsedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+/// Full workspace export. Available to every plan with no tier restriction and
+/// no usage fee — reduced switching cost is a deliberate trust signal, not an
+/// afterthought (FR-DATA-09).
+model ExportJob {
+  id             String       @id @default(uuid())
+  organizationId String
+  requestedById  String?
+  status         ExportStatus @default(QUEUED)
+  filePath       String?
+  error          String?
+  createdAt      DateTime     @default(now())
+  completedAt    DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  requestedBy  User?        @relation(fields: [requestedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+}
