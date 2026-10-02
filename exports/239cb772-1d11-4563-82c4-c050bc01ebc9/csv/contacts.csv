@@ -1,0 +1,4 @@
+id,organizationId,companyId,email,firstName,lastName,phone,title,source,excluded,createdAt,updatedAt
+8c75c2d0-abe3-41aa-94de-64dbb5cb5421,23ca431e-f018-44dc-b1ae-0253383f083d,f730b8d3-8806-4696-bce5-2de91eda8172,marcus.bell@northwind-logistics.com,Marc,Bell,,Head of Security,AGENT_INFERRED,false,2026-08-05T18:28:12.069Z,2026-08-05T18:28:12.069Z
+eed747ea-8a67-43c4-b6d0-1eff02dc56e1,23ca431e-f018-44dc-b1ae-0253383f083d,6c1e6496-2303-42d7-a699-9923c156fbb5,p.raman@meridianfreight.test,Priya,Raman,,Head of Procurement,HUMAN,false,2026-08-05T18:27:58.751Z,2026-08-05T18:27:58.751Z
+579becbe-1e5a-4a5a-84d9-638fc4b66bd1,23ca431e-f018-44dc-b1ae-0253383f083d,f730b8d3-8806-4696-bce5-2de91eda8172,dana.whitfield@northwind-logistics.com,Dana,Whitfield,+14155550142,VP Operations,HUMAN,false,2026-08-05T18:27:58.724Z,2026-08-05T18:27:58.767Z

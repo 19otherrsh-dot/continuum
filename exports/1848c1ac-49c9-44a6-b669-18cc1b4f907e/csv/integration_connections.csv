@@ -1,0 +1,2 @@
+id,organizationId,userId,provider,status,accountEmail,expiresAt,syncCursor,calendarCursor,lastSyncedAt,nextPollAt,backoffSeconds,failureCount,lastError,backfillCompletedAt,createdAt,updatedAt
+62ac230e-8025-413e-a192-92e3154e81e7,01d89065-ae0c-4831-968d-ad56f3660900,de80e15b-eb04-4656-aca3-5e6869991e82,GOOGLE,CONNECTED,you@continuum.test,2026-08-04T12:54:04.650Z,10,,2026-08-04T11:54:47.987Z,2026-08-04T11:55:47.987Z,60,0,,2026-08-04T11:54:07.362Z,2026-08-04T11:54:04.652Z,2026-08-04T11:54:47.989Z

@@ -1,0 +1,2 @@
+id,name,motion,showProjectsUi,stallingThresholdDays,agentHighThreshold,agentMediumThreshold,planName,seatCount,pricePerSeatCents,encryptedDataKey,autoApplyOptIn,createdAt,updatedAt
+1735312d-5053-43c6-a4e8-5d5768478cab,Northwind Sales,SALES,false,5,0.8,0.5,Team,2,3900,,false,2026-08-05T17:39:39.305Z,2026-08-05T17:39:39.305Z

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "b3756f2e-0804-4dc2-80e6-3815a5a9c41f",
+    "name": "Northwind Sales",
+    "motion": "SALES",
+    "showProjectsUi": false,
+    "stallingThresholdDays": 5,
+    "agentHighThreshold": 0.8,
+    "agentMediumThreshold": 0.5,
+    "planName": "Team",
+    "seatCount": 2,
+    "pricePerSeatCents": 3900,
+    "encryptedDataKey": null,
+    "autoApplyOptIn": false,
+    "createdAt": "2026-08-04T06:53:38.821Z",
+    "updatedAt": "2026-08-04T06:53:38.821Z"
+  }
+]

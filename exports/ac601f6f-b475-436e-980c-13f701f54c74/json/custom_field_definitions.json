@@ -1,0 +1,17 @@
+[
+  {
+    "id": "822c57ac-8de2-48c9-85a4-a79e0c3b13ac",
+    "organizationId": "33ae1c21-a844-46e9-9034-7582e2ff1968",
+    "entityType": "DEAL",
+    "key": "procurement_route",
+    "label": "Procurement route",
+    "type": "SELECT",
+    "options": [
+      "Direct",
+      "Reseller",
+      "Marketplace"
+    ],
+    "archivedAt": null,
+    "createdAt": "2026-08-04T06:55:49.086Z"
+  }
+]

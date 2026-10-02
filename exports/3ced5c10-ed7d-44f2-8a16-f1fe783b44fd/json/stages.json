@@ -1,0 +1,56 @@
+[
+  {
+    "id": "c7783ea7-4b4b-4154-b16d-ab7a09362b16",
+    "pipelineId": "fc91d2ae-423e-40e0-837a-674aa6e3cc53",
+    "name": "New Lead",
+    "order": 0,
+    "winProbability": 0.1,
+    "isWonStage": false,
+    "isLostStage": false
+  },
+  {
+    "id": "7bf488cd-c5ed-4d34-b73a-da4df9ec770b",
+    "pipelineId": "fc91d2ae-423e-40e0-837a-674aa6e3cc53",
+    "name": "Contacted",
+    "order": 1,
+    "winProbability": 0.2,
+    "isWonStage": false,
+    "isLostStage": false
+  },
+  {
+    "id": "415d1214-4ea4-4cf2-a255-ce6651efcb8f",
+    "pipelineId": "fc91d2ae-423e-40e0-837a-674aa6e3cc53",
+    "name": "Qualified",
+    "order": 2,
+    "winProbability": 0.4,
+    "isWonStage": false,
+    "isLostStage": false
+  },
+  {
+    "id": "e8e554bb-0664-4503-9a28-af84b4c58768",
+    "pipelineId": "fc91d2ae-423e-40e0-837a-674aa6e3cc53",
+    "name": "Proposal",
+    "order": 3,
+    "winProbability": 0.65,
+    "isWonStage": false,
+    "isLostStage": false
+  },
+  {
+    "id": "cd8b39ec-1379-4ee1-8347-b1e62d99a6a5",
+    "pipelineId": "fc91d2ae-423e-40e0-837a-674aa6e3cc53",
+    "name": "Won",
+    "order": 4,
+    "winProbability": 1,
+    "isWonStage": true,
+    "isLostStage": false
+  },
+  {
+    "id": "f723913a-1d50-4d36-8cf8-f22bcaa5f043",
+    "pipelineId": "fc91d2ae-423e-40e0-837a-674aa6e3cc53",
+    "name": "Lost",
+    "order": 5,
+    "winProbability": 0,
+    "isWonStage": false,
+    "isLostStage": true
+  }
+]

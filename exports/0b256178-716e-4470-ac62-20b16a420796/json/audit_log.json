@@ -1,0 +1,41 @@
+[
+  {
+    "id": "1de8c78c-f1b4-4376-b982-3f9cb27041f7",
+    "organizationId": "1735312d-5053-43c6-a4e8-5d5768478cab",
+    "actorType": "HUMAN",
+    "actorId": "726ef515-835d-4e86-8f2a-3ddec03ab349",
+    "actorName": "Alex Rivera",
+    "entityType": "DEAL",
+    "entityId": "7424925e-f0f8-4a3d-806b-af1407803a6b",
+    "field": "stageId",
+    "priorValue": "Qualified",
+    "newValue": "Proposal",
+    "createdAt": "2026-08-05T17:39:52.711Z"
+  },
+  {
+    "id": "507f2f90-0f5c-446e-8a81-01d675c80cc8",
+    "organizationId": "1735312d-5053-43c6-a4e8-5d5768478cab",
+    "actorType": "HUMAN",
+    "actorId": "726ef515-835d-4e86-8f2a-3ddec03ab349",
+    "actorName": "Alex Rivera",
+    "entityType": "DEAL",
+    "entityId": "7424925e-f0f8-4a3d-806b-af1407803a6b",
+    "field": "stageSource",
+    "priorValue": "HUMAN",
+    "newValue": "AGENT_INFERRED",
+    "createdAt": "2026-08-05T17:39:52.711Z"
+  },
+  {
+    "id": "a530f3ad-bab0-4f5b-b5d7-33d65435e591",
+    "organizationId": "1735312d-5053-43c6-a4e8-5d5768478cab",
+    "actorType": "HUMAN",
+    "actorId": "726ef515-835d-4e86-8f2a-3ddec03ab349",
+    "actorName": "Alex Rivera",
+    "entityType": "DEAL",
+    "entityId": "7424925e-f0f8-4a3d-806b-af1407803a6b",
+    "field": "agent:CHANGE_DEAL_STAGE",
+    "priorValue": "{\"stageName\":\"Proposal\"}",
+    "newValue": "{\"stageName\":\"Proposal\"}",
+    "createdAt": "2026-08-05T17:39:52.733Z"
+  }
+]

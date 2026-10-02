@@ -1,0 +1,7 @@
+id,pipelineId,name,order,winProbability,isWonStage,isLostStage
+f145fa13-ec34-4a0a-8fb2-6bd5b4830859,eae10355-9cd3-4775-a486-7e47fa3d2ce3,New Lead,0,0.1,false,false
+b9b4b812-f8ef-4984-98a2-38076c448b89,eae10355-9cd3-4775-a486-7e47fa3d2ce3,Contacted,1,0.2,false,false
+2c485bf7-d697-444c-a2b6-c1fbfcf5f1cb,eae10355-9cd3-4775-a486-7e47fa3d2ce3,Qualified,2,0.4,false,false
+346e8ed4-d389-4be1-a147-1543f364f0f4,eae10355-9cd3-4775-a486-7e47fa3d2ce3,Proposal,3,0.65,false,false
+8109cdd8-467a-4bb5-a30e-871716266c85,eae10355-9cd3-4775-a486-7e47fa3d2ce3,Won,4,1,true,false
+7220ba4c-22ed-4ce2-9ad9-260037549214,eae10355-9cd3-4775-a486-7e47fa3d2ce3,Lost,5,0,false,true

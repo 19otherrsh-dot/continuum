@@ -1,0 +1,44 @@
+[
+  {
+    "id": "c4044a26-c3c5-4ab1-b15f-3a6405142184",
+    "organizationId": "b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5",
+    "companyId": "ea17bede-0e2a-443e-8c9e-5a183e62b6a6",
+    "email": "p.raman@meridianfreight.test",
+    "firstName": "Priya",
+    "lastName": "Raman",
+    "phone": null,
+    "title": "Head of Procurement",
+    "source": "HUMAN",
+    "excluded": false,
+    "createdAt": "2026-08-05T18:36:42.234Z",
+    "updatedAt": "2026-08-05T18:36:42.234Z"
+  },
+  {
+    "id": "56bbdaf9-6945-426b-9d0e-5746a6e26127",
+    "organizationId": "b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5",
+    "companyId": "96f4c1bb-9968-44f9-9ebe-7d61d23cccfe",
+    "email": "dana.whitfield@northwind-logistics.com",
+    "firstName": "Dana",
+    "lastName": "Whitfield",
+    "phone": "+14155550142",
+    "title": "VP Operations",
+    "source": "HUMAN",
+    "excluded": false,
+    "createdAt": "2026-08-05T18:36:42.208Z",
+    "updatedAt": "2026-08-05T18:36:42.250Z"
+  },
+  {
+    "id": "c06f2306-eb42-4fe3-bc61-fcff1a955b26",
+    "organizationId": "b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5",
+    "companyId": "96f4c1bb-9968-44f9-9ebe-7d61d23cccfe",
+    "email": "marcus.bell@northwind-logistics.com",
+    "firstName": "Marc",
+    "lastName": "Bell",
+    "phone": null,
+    "title": "Head of Security",
+    "source": "AGENT_INFERRED",
+    "excluded": false,
+    "createdAt": "2026-08-05T18:37:24.259Z",
+    "updatedAt": "2026-08-05T18:37:24.259Z"
+  }
+]

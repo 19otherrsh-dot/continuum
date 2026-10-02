@@ -1,0 +1,74 @@
+id,organizationId,type,direction,subject,body,occurredAt,source,externalRef,connectionId,threadRef,durationSeconds,callOutcome,recordingUrl,transcript,externalCallId,rawBodyTransient,aiSummary,sentiment,nextStep,summaryStatus,summaryError,createdAt
+81845425-fbfd-43b5-b083-dd03d27610e5,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,CALL,OUTBOUND,Call with Dana,"Rep: Thanks for making the time. I know you were waiting on the security review before we talked commercials.
+
+Contact: That's right. Marcus came back yesterday — he's satisfied with the data-handling summary. No blockers from his side.
+
+Rep: That's good to hear. So where does that leave us?
+
+Contact: Budget's approved. Finance signed off this morning for the forty-seat pilot. What I need from you is the paperwork, and we'd like to be live by the start of next month.
+
+Rep: I can have the agreement over to you today. On timing, forty seats provisioned inside a week is realistic once it's signed.
+
+Contact: Good. Send it across and I'll get it turned around this week.
+
+Rep: Will do. I'll also include the onboarding plan so your team knows what the first fortnight looks like.
+
+Contact: Appreciated. Talk soon.",2026-08-05T18:37:24.087Z,HUMAN,,,,442,CONNECTED,sim://recordings/sim-call-0926a523-4fcc-4e8a-852a-4956dc3ef428,"Rep: Thanks for making the time. I know you were waiting on the security review before we talked commercials.
+
+Contact: That's right. Marcus came back yesterday — he's satisfied with the data-handling summary. No blockers from his side.
+
+Rep: That's good to hear. So where does that leave us?
+
+Contact: Budget's approved. Finance signed off this morning for the forty-seat pilot. What I need from you is the paperwork, and we'd like to be live by the start of next month.
+
+Rep: I can have the agreement over to you today. On timing, forty seats provisioned inside a week is realistic once it's signed.
+
+Contact: Good. Send it across and I'll get it turned around this week.
+
+Rep: Will do. I'll also include the onboarding plan so your team knows what the first fortnight looks like.
+
+Contact: Appreciated. Talk soon.",sim-call-0926a523-4fcc-4e8a-852a-4956dc3ef428,,Rep: Thanks for making the time. I know you were waiting on the security review before we talked commercials. Contact: That's right.,POSITIVE,Get it turned around this week,DONE,,2026-08-05T18:37:24.091Z
+7d5246e8-65e5-4d0f-a08b-b112996fa8d4,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,EMAIL,INBOUND,Re: Northwind — pilot scope,"Hi,
+
+Thanks for sending the scope over. I walked the team through it this morning and the reaction was positive. The 40-seat pilot looks right for us.
+
+Two things before we go further: we need SSO on day one, and our security team will want to see your data-handling summary.
+
+Can we get 30 minutes on Thursday?
+
+Best,
+Dana",2026-07-31T03:30:00.000Z,AGENT_INFERRED,sim-msg-001,c4c24b01-3dfe-46e5-997d-bb656bf76aa0,sim-thread-northwind,,,,,,,"Hi, Thanks for sending the scope over. I walked the team through it this morning and the reaction was positive. The 40-seat pilot looks right for us.",POSITIVE,Get 30 minutes on Thursday,DONE,,2026-08-05T18:36:43.391Z
+6a840c18-cac4-46d5-a6a9-ada94bd43fcf,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,EMAIL,OUTBOUND,Re: Northwind — pilot scope,"Dana,
+
+Thursday at 2pm works. I'll send an invite.
+
+SSO is included in the plan you're looking at, and I'll attach the data-handling summary ahead of the call so your security team has time with it.
+
+Speak Thursday,",2026-07-31T08:30:00.000Z,AGENT_INFERRED,sim-msg-002,c4c24b01-3dfe-46e5-997d-bb656bf76aa0,sim-thread-northwind,,,,,,,"Dana, Thursday at 2pm works. I'll send an invite. SSO is included in the plan you're looking at, and I'll attach the data-handling summary ahead of the call so your security team has time with it.",NEUTRAL,Send an invite,DONE,,2026-08-05T18:36:43.452Z
+6cdb5240-83bd-4382-83c2-c148139e2a1f,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,EMAIL,INBOUND,Re: Northwind — pilot scope (looping in security),"Adding Marcus from our security side.
+
+Marcus, this is the vendor I mentioned. They've got the data-handling summary coming ahead of Thursday.
+
+Dana",2026-08-01T05:30:00.000Z,AGENT_INFERRED,sim-msg-003,c4c24b01-3dfe-46e5-997d-bb656bf76aa0,sim-thread-northwind,,,,,,,"Adding Marcus from our security side. Marcus, this is the vendor I mentioned. They've got the data-handling summary coming ahead of Thursday.",NEUTRAL,,DONE,,2026-08-05T18:36:43.491Z
+f548bdf2-9d05-4bd0-94d3-749640911bd0,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,EMAIL,INBOUND,Re: Northwind — pilot scope,"Good news — budget is approved for the 40-seat pilot.
+
+Finance signed off this morning. Send the paperwork over and we'll get it turned around this week. We're aiming to be live by the start of next month.
+
+Dana",2026-08-04T03:30:00.000Z,AGENT_INFERRED,sim-msg-004,c4c24b01-3dfe-46e5-997d-bb656bf76aa0,sim-thread-northwind,,,,,,,Good news — budget is approved for the 40-seat pilot. Finance signed off this morning. Send the paperwork over and we'll get it turned around this week.,POSITIVE,Get it turned around this week,DONE,,2026-08-05T18:36:43.566Z
+d362b4d7-3862-48c9-8de1-1b5e9fa431f5,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,EMAIL,INBOUND,Harbor Creative — website rebuild,"Hello,
+
+We're a 30-person design studio and we're looking at rebuilding our marketing site before the new year. Rough budget is somewhere around 60k.
+
+I've copied Priya from our agency partner, who'll be helping us scope it.
+
+Would you have capacity to talk next week?
+
+Regards,
+Tomas Lind
+Harbor Creative",2026-07-29T09:30:00.000Z,AGENT_INFERRED,sim-msg-007,c4c24b01-3dfe-46e5-997d-bb656bf76aa0,sim-thread-harbor,,,,,,,"Hello, We're a 30-person design studio and we're looking at rebuilding our marketing site before the new year. Rough budget is somewhere around 60k. I've copied Priya from our agency partner, who'll be helping us scope it.",NEUTRAL,,DONE,,2026-08-05T18:36:43.607Z
+b13df48e-3622-4a1e-8959-007ac281a0ce,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,EMAIL,OUTBOUND,Re: Harbor Creative — website rebuild,"Tomas,
+
+We'd be glad to. I've put a hold on Tuesday at 11.
+
+Ahead of that, it would help to know roughly how many templates you're expecting and whether the CMS is staying put.",2026-07-30T03:30:00.000Z,AGENT_INFERRED,sim-msg-008,c4c24b01-3dfe-46e5-997d-bb656bf76aa0,sim-thread-harbor,,,,,,,"Tomas, We'd be glad to. I've put a hold on Tuesday at 11. Ahead of that, it would help to know roughly how many templates you're expecting and whether the CMS is staying put.",POSITIVE,,DONE,,2026-08-05T18:36:43.636Z
+ea57eabb-2a1a-4432-b438-cb6bda84bf79,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,MEETING,OUTBOUND,Northwind — security review (moved),Rescheduled at Northwind's request.,2026-08-08T10:30:00.000Z,AGENT_INFERRED,sim-evt-101,c4c24b01-3dfe-46e5-997d-bb656bf76aa0,,3600,,,,,,Walk through the data-handling summary with Northwind security.,NEUTRAL,,DONE,,2026-08-05T18:36:43.659Z

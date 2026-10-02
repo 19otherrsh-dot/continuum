@@ -1,0 +1,65 @@
+[
+  {
+    "id": "5cbb266e-92c5-47ab-ba71-9f449eddf23c",
+    "organizationId": "d9f4cdcc-7391-4ec2-9c51-e3511ccfd0ed",
+    "name": "Sales Pipeline",
+    "isDefault": true,
+    "createdAt": "2026-08-06T05:46:39.659Z",
+    "stages": [
+      {
+        "id": "16c77eb3-9aaa-428b-9d63-9a295790909f",
+        "pipelineId": "5cbb266e-92c5-47ab-ba71-9f449eddf23c",
+        "name": "New Lead",
+        "order": 0,
+        "winProbability": 0.1,
+        "isWonStage": false,
+        "isLostStage": false
+      },
+      {
+        "id": "a92cdb22-86aa-47d5-a000-8f21a115e485",
+        "pipelineId": "5cbb266e-92c5-47ab-ba71-9f449eddf23c",
+        "name": "Contacted",
+        "order": 1,
+        "winProbability": 0.2,
+        "isWonStage": false,
+        "isLostStage": false
+      },
+      {
+        "id": "7b5673a1-4a02-4d4e-a25a-8c3690ad49db",
+        "pipelineId": "5cbb266e-92c5-47ab-ba71-9f449eddf23c",
+        "name": "Qualified",
+        "order": 2,
+        "winProbability": 0.4,
+        "isWonStage": false,
+        "isLostStage": false
+      },
+      {
+        "id": "7fab3bbe-9542-4004-96fc-d46b65a9c604",
+        "pipelineId": "5cbb266e-92c5-47ab-ba71-9f449eddf23c",
+        "name": "Proposal",
+        "order": 3,
+        "winProbability": 0.65,
+        "isWonStage": false,
+        "isLostStage": false
+      },
+      {
+        "id": "e4082381-dd9a-4002-995c-176e48308365",
+        "pipelineId": "5cbb266e-92c5-47ab-ba71-9f449eddf23c",
+        "name": "Won",
+        "order": 4,
+        "winProbability": 1,
+        "isWonStage": true,
+        "isLostStage": false
+      },
+      {
+        "id": "ab21f967-a6ae-4ef1-b7f8-7c12d328370a",
+        "pipelineId": "5cbb266e-92c5-47ab-ba71-9f449eddf23c",
+        "name": "Lost",
+        "order": 5,
+        "winProbability": 0,
+        "isWonStage": false,
+        "isLostStage": true
+      }
+    ]
+  }
+]

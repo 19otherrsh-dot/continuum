@@ -1,0 +1,54 @@
+[
+  {
+    "id": "4983820f-8b97-4859-86bf-e96fc243c4b7",
+    "organizationId": "e0b5fef4-063a-4d0b-ac04-3c2e2b4db469",
+    "actorType": "HUMAN",
+    "actorId": "b25797c8-729f-41bb-b332-a049a440724e",
+    "actorName": "Alex Rivera",
+    "entityType": "DEAL",
+    "entityId": "a97e0131-4575-4cf2-88bf-c985d756a9f0",
+    "field": "stageId",
+    "priorValue": "Qualified",
+    "newValue": "Proposal",
+    "createdAt": "2026-08-04T05:51:55.054Z"
+  },
+  {
+    "id": "9a24cb18-45a0-425e-9dff-d69b022ad717",
+    "organizationId": "e0b5fef4-063a-4d0b-ac04-3c2e2b4db469",
+    "actorType": "HUMAN",
+    "actorId": "b25797c8-729f-41bb-b332-a049a440724e",
+    "actorName": "Alex Rivera",
+    "entityType": "DEAL",
+    "entityId": "a97e0131-4575-4cf2-88bf-c985d756a9f0",
+    "field": "stageSource",
+    "priorValue": "HUMAN",
+    "newValue": "AGENT_INFERRED",
+    "createdAt": "2026-08-04T05:51:55.054Z"
+  },
+  {
+    "id": "e6931ce2-b293-4425-8027-7259e7507e6f",
+    "organizationId": "e0b5fef4-063a-4d0b-ac04-3c2e2b4db469",
+    "actorType": "HUMAN",
+    "actorId": "b25797c8-729f-41bb-b332-a049a440724e",
+    "actorName": "Alex Rivera",
+    "entityType": "DEAL",
+    "entityId": "a97e0131-4575-4cf2-88bf-c985d756a9f0",
+    "field": "agent:CHANGE_DEAL_STAGE",
+    "priorValue": "{\"stageName\":\"Proposal\"}",
+    "newValue": "{\"stageName\":\"Proposal\"}",
+    "createdAt": "2026-08-04T05:51:55.078Z"
+  },
+  {
+    "id": "5588fcf4-98c9-486a-815a-8fc1208fb840",
+    "organizationId": "e0b5fef4-063a-4d0b-ac04-3c2e2b4db469",
+    "actorType": "HUMAN",
+    "actorId": "b25797c8-729f-41bb-b332-a049a440724e",
+    "actorName": "Alex Rivera",
+    "entityType": "CONTACT",
+    "entityId": "d0f2895f-1c6d-43eb-a226-ae3991523d35",
+    "field": "agent:CREATE_CONTACT",
+    "priorValue": "{\"email\":\"marcus.bell@northwind-logistics.com\",\"title\":null,\"dealId\":\"a97e0131-4575-4cf2-88bf-c985d756a9f0\",\"lastName\":\"Bell\",\"firstName\":\"Marcus\"}",
+    "newValue": "{\"email\":\"marcus.bell@northwind-logistics.com\",\"title\":\"Head of Security\",\"dealId\":\"a97e0131-4575-4cf2-88bf-c985d756a9f0\",\"lastName\":\"Bell\",\"firstName\":\"Marc\"}",
+    "createdAt": "2026-08-04T05:51:55.150Z"
+  }
+]

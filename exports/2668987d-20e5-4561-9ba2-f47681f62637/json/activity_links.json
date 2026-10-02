@@ -1,0 +1,114 @@
+[
+  {
+    "id": "c10a319b-b54c-4514-a5ac-91bc295ea1ea",
+    "activityId": "7d5246e8-65e5-4d0f-a08b-b112996fa8d4",
+    "entityType": "DEAL",
+    "entityId": "e7349c7d-fd0d-4d66-ae55-6d118e3b4f25",
+    "isPrimary": true
+  },
+  {
+    "id": "6f72afec-fa2a-4178-9a90-a1d5ddf5c053",
+    "activityId": "7d5246e8-65e5-4d0f-a08b-b112996fa8d4",
+    "entityType": "COMPANY",
+    "entityId": "96f4c1bb-9968-44f9-9ebe-7d61d23cccfe",
+    "isPrimary": false
+  },
+  {
+    "id": "b5865569-fd89-4b56-ba94-f2614d4b04ed",
+    "activityId": "7d5246e8-65e5-4d0f-a08b-b112996fa8d4",
+    "entityType": "CONTACT",
+    "entityId": "56bbdaf9-6945-426b-9d0e-5746a6e26127",
+    "isPrimary": false
+  },
+  {
+    "id": "405f2b6e-e73b-49bf-a8f7-c08f41449aea",
+    "activityId": "6a840c18-cac4-46d5-a6a9-ada94bd43fcf",
+    "entityType": "DEAL",
+    "entityId": "e7349c7d-fd0d-4d66-ae55-6d118e3b4f25",
+    "isPrimary": true
+  },
+  {
+    "id": "69c2a2c6-c0cc-4c1e-8dcd-94a7c425647f",
+    "activityId": "6a840c18-cac4-46d5-a6a9-ada94bd43fcf",
+    "entityType": "COMPANY",
+    "entityId": "96f4c1bb-9968-44f9-9ebe-7d61d23cccfe",
+    "isPrimary": false
+  },
+  {
+    "id": "c4ec5388-6adf-4f28-8a4e-3db378a99471",
+    "activityId": "6a840c18-cac4-46d5-a6a9-ada94bd43fcf",
+    "entityType": "CONTACT",
+    "entityId": "56bbdaf9-6945-426b-9d0e-5746a6e26127",
+    "isPrimary": false
+  },
+  {
+    "id": "ae727572-fc2b-4187-8ac3-ee26154265bf",
+    "activityId": "6cdb5240-83bd-4382-83c2-c148139e2a1f",
+    "entityType": "DEAL",
+    "entityId": "e7349c7d-fd0d-4d66-ae55-6d118e3b4f25",
+    "isPrimary": true
+  },
+  {
+    "id": "3901a60e-b680-4e68-934b-f69fba8e1dc4",
+    "activityId": "6cdb5240-83bd-4382-83c2-c148139e2a1f",
+    "entityType": "COMPANY",
+    "entityId": "96f4c1bb-9968-44f9-9ebe-7d61d23cccfe",
+    "isPrimary": false
+  },
+  {
+    "id": "085c70d0-68e0-47e9-99b9-8d0cc7693d1d",
+    "activityId": "6cdb5240-83bd-4382-83c2-c148139e2a1f",
+    "entityType": "CONTACT",
+    "entityId": "56bbdaf9-6945-426b-9d0e-5746a6e26127",
+    "isPrimary": false
+  },
+  {
+    "id": "9577017c-0ab1-4dd9-bada-f9e803fbadd1",
+    "activityId": "f548bdf2-9d05-4bd0-94d3-749640911bd0",
+    "entityType": "DEAL",
+    "entityId": "e7349c7d-fd0d-4d66-ae55-6d118e3b4f25",
+    "isPrimary": true
+  },
+  {
+    "id": "c24b93a7-bf4d-41ed-b041-528228363375",
+    "activityId": "f548bdf2-9d05-4bd0-94d3-749640911bd0",
+    "entityType": "COMPANY",
+    "entityId": "96f4c1bb-9968-44f9-9ebe-7d61d23cccfe",
+    "isPrimary": false
+  },
+  {
+    "id": "e9df0ba0-72a6-47c4-b0f3-d77b7f487e49",
+    "activityId": "f548bdf2-9d05-4bd0-94d3-749640911bd0",
+    "entityType": "CONTACT",
+    "entityId": "56bbdaf9-6945-426b-9d0e-5746a6e26127",
+    "isPrimary": false
+  },
+  {
+    "id": "fd9dff8c-1c44-436b-ae6d-71693f5bea9b",
+    "activityId": "ea57eabb-2a1a-4432-b438-cb6bda84bf79",
+    "entityType": "DEAL",
+    "entityId": "e7349c7d-fd0d-4d66-ae55-6d118e3b4f25",
+    "isPrimary": true
+  },
+  {
+    "id": "153dce5b-3e7b-4823-86e7-24b92c923c8e",
+    "activityId": "ea57eabb-2a1a-4432-b438-cb6bda84bf79",
+    "entityType": "COMPANY",
+    "entityId": "96f4c1bb-9968-44f9-9ebe-7d61d23cccfe",
+    "isPrimary": false
+  },
+  {
+    "id": "a60f7ccf-7bd7-4393-8fe7-fdbff59f3199",
+    "activityId": "ea57eabb-2a1a-4432-b438-cb6bda84bf79",
+    "entityType": "CONTACT",
+    "entityId": "56bbdaf9-6945-426b-9d0e-5746a6e26127",
+    "isPrimary": false
+  },
+  {
+    "id": "1e17b440-e8b1-4db1-bebc-7b816eef10b8",
+    "activityId": "81845425-fbfd-43b5-b083-dd03d27610e5",
+    "entityType": "CONTACT",
+    "entityId": "56bbdaf9-6945-426b-9d0e-5746a6e26127",
+    "isPrimary": true
+  }
+]

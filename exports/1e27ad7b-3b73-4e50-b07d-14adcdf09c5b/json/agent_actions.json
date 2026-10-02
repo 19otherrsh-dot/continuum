@@ -1,0 +1,54 @@
+[
+  {
+    "id": "934351f0-f239-4632-9a29-aeeca33bb73d",
+    "organizationId": "218c4b68-987e-4ad1-92b4-396dd7539a4d",
+    "type": "CREATE_CONTACT",
+    "status": "CONFIRMED",
+    "targetEntityType": "CONTACT",
+    "targetEntityId": null,
+    "proposedPayload": {
+      "email": "marcus.bell@northwind-logistics.com",
+      "title": null,
+      "dealId": "e28f0cdb-777a-4d76-bde0-e152d0a03225",
+      "lastName": "Bell",
+      "firstName": "Marcus"
+    },
+    "appliedPayload": {
+      "email": "marcus.bell@northwind-logistics.com",
+      "title": "Head of Security",
+      "dealId": "e28f0cdb-777a-4d76-bde0-e152d0a03225",
+      "lastName": "Bell",
+      "firstName": "Marc"
+    },
+    "confidenceScore": 0.85,
+    "tier": "HIGH",
+    "rationale": "marcus.bell@northwind-logistics.com took part in this thread and their domain belongs to a company already in the CRM, but there is no contact for them yet.",
+    "sourceActivityId": "cb832660-f8e7-47ef-80f8-31f61ff008a1",
+    "reviewedByUserId": "ec9cbb16-0dd1-4af2-adc0-79987d239baa",
+    "reviewedAt": "2026-08-04T05:40:30.267Z",
+    "failureReason": null,
+    "createdAt": "2026-08-04T05:40:29.539Z"
+  },
+  {
+    "id": "9462bcb4-19d9-4840-bbfb-8447f6d44e46",
+    "organizationId": "218c4b68-987e-4ad1-92b4-396dd7539a4d",
+    "type": "CHANGE_DEAL_STAGE",
+    "status": "CONFIRMED",
+    "targetEntityType": "DEAL",
+    "targetEntityId": "e28f0cdb-777a-4d76-bde0-e152d0a03225",
+    "proposedPayload": {
+      "stageName": "Proposal"
+    },
+    "appliedPayload": {
+      "stageName": "Proposal"
+    },
+    "confidenceScore": 0.86,
+    "tier": "HIGH",
+    "rationale": "The message states: \"budget is approved\".",
+    "sourceActivityId": "d9b9b012-66a8-4e7f-9b34-444fe9350a81",
+    "reviewedByUserId": "ec9cbb16-0dd1-4af2-adc0-79987d239baa",
+    "reviewedAt": "2026-08-04T05:40:30.057Z",
+    "failureReason": null,
+    "createdAt": "2026-08-04T05:40:29.641Z"
+  }
+]

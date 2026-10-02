@@ -1,0 +1,26 @@
+[
+  {
+    "id": "ad94e1f0-0e2c-4e25-82f7-98d67112f113",
+    "organizationId": "b3756f2e-0804-4dc2-80e6-3815a5a9c41f",
+    "userId": "75ea00a4-9f8f-4955-b0b6-a7959b1d2eb6",
+    "type": "AGENT_ACTION_PENDING",
+    "title": "Add marcus.bell@northwind-logistics.com as a contact?",
+    "body": "marcus.bell@northwind-logistics.com took part in this thread and their domain belongs to a company already in the CRM, but there is no contact for them yet. Creating a record always requires confirmation, whatever the confidence.",
+    "entityType": "CONTACT",
+    "entityId": null,
+    "readAt": null,
+    "createdAt": "2026-08-04T06:53:52.776Z"
+  },
+  {
+    "id": "4a1bf601-fc71-4688-80cc-2d5592f3bfa0",
+    "organizationId": "b3756f2e-0804-4dc2-80e6-3815a5a9c41f",
+    "userId": "919620aa-db97-4099-9f9b-998eeb69e4e3",
+    "type": "AGENT_ACTION_PENDING",
+    "title": "Move this deal to Proposal?",
+    "body": "The message states: \"budget is approved\". Stage proposals never advance more than one stage at a time.",
+    "entityType": "DEAL",
+    "entityId": "5eb447b3-d84f-4fd0-8e3a-35fb89f4d65b",
+    "readAt": null,
+    "createdAt": "2026-08-04T06:53:52.862Z"
+  }
+]

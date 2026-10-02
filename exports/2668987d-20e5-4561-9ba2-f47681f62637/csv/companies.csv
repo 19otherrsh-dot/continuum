@@ -1,0 +1,3 @@
+id,organizationId,name,domain,website,source,createdAt,updatedAt
+96f4c1bb-9968-44f9-9ebe-7d61d23cccfe,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,Northwind Logistics,northwind-logistics.com,https://northwind-logistics.com,HUMAN,2026-08-05T18:36:42.202Z,2026-08-05T18:36:42.202Z
+ea17bede-0e2a-443e-8c9e-5a183e62b6a6,b3914f16-3e5e-4614-95fa-0e0ad6e8d0e5,Meridian Freight,meridianfreight.test,,HUMAN,2026-08-05T18:36:42.228Z,2026-08-05T18:36:42.228Z

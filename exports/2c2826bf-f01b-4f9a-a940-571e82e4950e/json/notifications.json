@@ -1,0 +1,41 @@
+[
+  {
+    "id": "a8bcac49-db6e-42d8-9297-2b130bbe0142",
+    "organizationId": "d9f4cdcc-7391-4ec2-9c51-e3511ccfd0ed",
+    "userId": "fd05f565-a0be-42fb-a06b-c7d282b410d6",
+    "type": "DEAL_STALLING",
+    "title": "Meridian Freight — regional rollout has gone quiet",
+    "body": "No captured activity in 5 days.",
+    "dedupeKey": "stalling:3f8c5a27-723f-496d-8eed-faa63dd34503",
+    "entityType": "DEAL",
+    "entityId": "3f8c5a27-723f-496d-8eed-faa63dd34503",
+    "readAt": null,
+    "createdAt": "2026-08-06T05:46:40.754Z"
+  },
+  {
+    "id": "b6988514-5414-425d-84d0-3420d8c82861",
+    "organizationId": "d9f4cdcc-7391-4ec2-9c51-e3511ccfd0ed",
+    "userId": "c4e1c60b-0af3-40ca-ace1-14a67b7412f7",
+    "type": "AGENT_ACTION_PENDING",
+    "title": "Add marcus.bell@northwind-logistics.com as a contact?",
+    "body": "marcus.bell@northwind-logistics.com took part in this thread and their domain belongs to a company already in the CRM, but there is no contact for them yet. Creating a record always requires confirmation, whatever the confidence.",
+    "dedupeKey": "agent-action:c7ac2e22-c3f2-44de-9894-06e6475d646a",
+    "entityType": "CONTACT",
+    "entityId": null,
+    "readAt": null,
+    "createdAt": "2026-08-06T05:46:40.939Z"
+  },
+  {
+    "id": "e2d6ee1c-4c7e-4759-a740-510fbc8aa102",
+    "organizationId": "d9f4cdcc-7391-4ec2-9c51-e3511ccfd0ed",
+    "userId": "fd05f565-a0be-42fb-a06b-c7d282b410d6",
+    "type": "AGENT_ACTION_PENDING",
+    "title": "Move this deal to Proposal?",
+    "body": "The message states: \"budget is approved\". Stage proposals never advance more than one stage at a time.",
+    "dedupeKey": "agent-action:f928a994-a338-416f-a57a-96a74cc5d315",
+    "entityType": "DEAL",
+    "entityId": "1d3aa010-3e13-4066-a9fd-2a23d9735b0a",
+    "readAt": null,
+    "createdAt": "2026-08-06T05:46:43.816Z"
+  }
+]

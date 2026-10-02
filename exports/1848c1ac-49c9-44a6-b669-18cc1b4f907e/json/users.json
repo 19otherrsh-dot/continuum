@@ -1,0 +1,22 @@
+[
+  {
+    "id": "de80e15b-eb04-4656-aca3-5e6869991e82",
+    "organizationId": "01d89065-ae0c-4831-968d-ad56f3660900",
+    "email": "alex@continuum.test",
+    "name": "Alex Rivera",
+    "role": "ADMIN",
+    "teamId": "2fe20410-4de7-4829-960b-9d82832283cc",
+    "createdAt": "2026-08-04T11:54:04.498Z",
+    "updatedAt": "2026-08-04T11:54:04.498Z"
+  },
+  {
+    "id": "dca7f86e-8b89-4d26-b941-f88a5a75dd6a",
+    "organizationId": "01d89065-ae0c-4831-968d-ad56f3660900",
+    "email": "sam@continuum.test",
+    "name": "Sam Okafor",
+    "role": "MEMBER",
+    "teamId": "2fe20410-4de7-4829-960b-9d82832283cc",
+    "createdAt": "2026-08-04T11:54:04.570Z",
+    "updatedAt": "2026-08-04T11:54:04.570Z"
+  }
+]

@@ -1,0 +1,2 @@
+id,organizationId,userId,type,title,body,dedupeKey,entityType,entityId,readAt,createdAt
+64cd53c7-1dd6-4370-a809-a2c740f53f84,1735312d-5053-43c6-a4e8-5d5768478cab,153d5df4-2f91-458f-b4a3-c531b834da1d,AGENT_ACTION_PENDING,Move this deal to Proposal?,"The message states: ""budget is approved"". Stage proposals never advance more than one stage at a time.",agent-action:91701705-d1aa-4178-8d44-cb7776147be4,DEAL,7424925e-f0f8-4a3d-806b-af1407803a6b,,2026-08-05T17:39:52.416Z

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "3a918e1a-592b-45c2-b02c-c1560f2cacfe",
+    "organizationId": "01d89065-ae0c-4831-968d-ad56f3660900",
+    "type": "CHANGE_DEAL_STAGE",
+    "status": "CONFIRMED",
+    "targetEntityType": "DEAL",
+    "targetEntityId": "56206067-f618-44c2-a8fd-8bff39ae91a5",
+    "proposedPayload": {
+      "stageName": "Proposal"
+    },
+    "appliedPayload": {
+      "stageName": "Proposal"
+    },
+    "confidenceScore": 0.9,
+    "tier": "HIGH",
+    "rationale": "The message states: \"budget is approved\". Stage proposals never advance more than one stage at a time.",
+    "sourceActivityId": "2aeba334-4e95-4dc5-a5b6-7250e53f80a2",
+    "reviewedByUserId": "de80e15b-eb04-4656-aca3-5e6869991e82",
+    "reviewedAt": "2026-08-04T11:54:48.282Z",
+    "failureReason": null,
+    "createdAt": "2026-08-04T11:54:07.058Z"
+  },
+  {
+    "id": "8ed3790f-dcd4-4aa6-ada3-51a25a197576",
+    "organizationId": "01d89065-ae0c-4831-968d-ad56f3660900",
+    "type": "CREATE_CONTACT",
+    "status": "CONFIRMED",
+    "targetEntityType": "CONTACT",
+    "targetEntityId": null,
+    "proposedPayload": {
+      "email": "marcus.bell@northwind-logistics.com",
+      "title": null,
+      "dealId": "56206067-f618-44c2-a8fd-8bff39ae91a5",
+      "lastName": "Bell",
+      "firstName": "Marcus"
+    },
+    "appliedPayload": {
+      "email": "marcus.bell@northwind-logistics.com",
+      "title": "Head of Security",
+      "dealId": "56206067-f618-44c2-a8fd-8bff39ae91a5",
+      "lastName": "Bell",
+      "firstName": "Marc"
+    },
+    "confidenceScore": 0.85,
+    "tier": "HIGH",
+    "rationale": "marcus.bell@northwind-logistics.com took part in this thread and their domain belongs to a company already in the CRM, but there is no contact for them yet. Creating a record always requires confirmation, whatever the confidence.",
+    "sourceActivityId": "2920904c-9417-4faa-be89-4948315b347b",
+    "reviewedByUserId": "de80e15b-eb04-4656-aca3-5e6869991e82",
+    "reviewedAt": "2026-08-04T11:54:48.394Z",
+    "failureReason": null,
+    "createdAt": "2026-08-04T11:54:06.912Z"
+  }
+]

@@ -1,0 +1,4 @@
+id,organizationId,actorType,actorId,actorName,entityType,entityId,field,priorValue,newValue,createdAt
+1de8c78c-f1b4-4376-b982-3f9cb27041f7,1735312d-5053-43c6-a4e8-5d5768478cab,HUMAN,726ef515-835d-4e86-8f2a-3ddec03ab349,Alex Rivera,DEAL,7424925e-f0f8-4a3d-806b-af1407803a6b,stageId,Qualified,Proposal,2026-08-05T17:39:52.711Z
+507f2f90-0f5c-446e-8a81-01d675c80cc8,1735312d-5053-43c6-a4e8-5d5768478cab,HUMAN,726ef515-835d-4e86-8f2a-3ddec03ab349,Alex Rivera,DEAL,7424925e-f0f8-4a3d-806b-af1407803a6b,stageSource,HUMAN,AGENT_INFERRED,2026-08-05T17:39:52.711Z
+a530f3ad-bab0-4f5b-b5d7-33d65435e591,1735312d-5053-43c6-a4e8-5d5768478cab,HUMAN,726ef515-835d-4e86-8f2a-3ddec03ab349,Alex Rivera,DEAL,7424925e-f0f8-4a3d-806b-af1407803a6b,agent:CHANGE_DEAL_STAGE,"{""stageName"":""Proposal""}","{""stageName"":""Proposal""}",2026-08-05T17:39:52.733Z

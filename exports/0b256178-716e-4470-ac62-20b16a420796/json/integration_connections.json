@@ -1,0 +1,21 @@
+[
+  {
+    "id": "495a755d-4500-4de1-a352-682f7730d878",
+    "organizationId": "1735312d-5053-43c6-a4e8-5d5768478cab",
+    "userId": "726ef515-835d-4e86-8f2a-3ddec03ab349",
+    "provider": "GOOGLE",
+    "status": "CONNECTED",
+    "accountEmail": "you@continuum.test",
+    "expiresAt": "2026-08-05T18:39:39.525Z",
+    "syncCursor": "10",
+    "calendarCursor": null,
+    "lastSyncedAt": "2026-08-05T17:39:52.549Z",
+    "nextPollAt": "2026-08-05T17:40:52.549Z",
+    "backoffSeconds": 60,
+    "failureCount": 0,
+    "lastError": null,
+    "backfillCompletedAt": "2026-08-05T17:39:52.275Z",
+    "createdAt": "2026-08-05T17:39:39.526Z",
+    "updatedAt": "2026-08-05T17:39:52.550Z"
+  }
+]

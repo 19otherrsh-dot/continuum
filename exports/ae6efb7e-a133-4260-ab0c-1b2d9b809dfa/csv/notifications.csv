@@ -1,0 +1,3 @@
+id,organizationId,userId,type,title,body,entityType,entityId,readAt,createdAt
+4f1c4869-e06e-411a-96d7-8064d7f4272a,e0b5fef4-063a-4d0b-ac04-3c2e2b4db469,b25797c8-729f-41bb-b332-a049a440724e,AGENT_ACTION_PENDING,Add marcus.bell@northwind-logistics.com as a contact?,"marcus.bell@northwind-logistics.com took part in this thread and their domain belongs to a company already in the CRM, but there is no contact for them yet.",CONTACT,,,2026-08-04T05:51:35.508Z
+f5f741ba-8148-4598-a81e-99cc569cd651,e0b5fef4-063a-4d0b-ac04-3c2e2b4db469,eb079bfe-0713-41c8-94cd-b7ae842a91cd,AGENT_ACTION_PENDING,Move this deal to Proposal?,"The message states: ""budget is approved"".",DEAL,a97e0131-4575-4cf2-88bf-c985d756a9f0,,2026-08-04T05:51:35.734Z

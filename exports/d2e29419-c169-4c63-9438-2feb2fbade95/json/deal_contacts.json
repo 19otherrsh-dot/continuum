@@ -1,0 +1,20 @@
+[
+  {
+    "dealId": "5eb447b3-d84f-4fd0-8e3a-35fb89f4d65b",
+    "contactId": "3bf950ad-cf95-4f95-bdac-adf168a15280",
+    "role": "decision maker",
+    "createdAt": "2026-08-04T06:53:39.179Z"
+  },
+  {
+    "dealId": "5eb447b3-d84f-4fd0-8e3a-35fb89f4d65b",
+    "contactId": "8f65a905-976f-415f-a6cd-c1f2a6901b23",
+    "role": null,
+    "createdAt": "2026-08-04T06:53:53.462Z"
+  },
+  {
+    "dealId": "5155d1cb-b6bd-4b83-9424-9bf33d057a8d",
+    "contactId": "14421ac9-f03b-428c-90b3-b2f783936192",
+    "role": "champion",
+    "createdAt": "2026-08-04T06:53:39.206Z"
+  }
+]

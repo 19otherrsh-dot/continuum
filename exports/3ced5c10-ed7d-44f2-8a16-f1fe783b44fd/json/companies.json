@@ -1,0 +1,22 @@
+[
+  {
+    "id": "3266aee5-a394-4b63-b77d-943be69d146e",
+    "organizationId": "5b82b95d-0e35-4490-aa79-4f8e955f5367",
+    "name": "Northwind Logistics",
+    "domain": "northwind-logistics.com",
+    "website": "https://northwind-logistics.com",
+    "source": "HUMAN",
+    "createdAt": "2026-08-04T11:42:27.839Z",
+    "updatedAt": "2026-08-04T11:42:27.839Z"
+  },
+  {
+    "id": "9dbc89f6-aa92-4c5b-90b0-510c7a9ff3c8",
+    "organizationId": "5b82b95d-0e35-4490-aa79-4f8e955f5367",
+    "name": "Meridian Freight",
+    "domain": "meridianfreight.test",
+    "website": null,
+    "source": "HUMAN",
+    "createdAt": "2026-08-04T11:42:27.872Z",
+    "updatedAt": "2026-08-04T11:42:27.872Z"
+  }
+]

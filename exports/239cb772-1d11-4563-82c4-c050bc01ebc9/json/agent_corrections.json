@@ -1,0 +1,24 @@
+[
+  {
+    "id": "e7339d57-c9b6-4a7b-8124-377e73e7887d",
+    "organizationId": "23ca431e-f018-44dc-b1ae-0253383f083d",
+    "companyId": "f730b8d3-8806-4696-bce5-2de91eda8172",
+    "actionType": "CREATE_CONTACT",
+    "fieldPath": "title",
+    "originalValue": "null",
+    "correctedValue": "Head of Security",
+    "correctedById": "043d6b57-ba35-4fde-8bb7-d31430cccb89",
+    "createdAt": "2026-08-05T18:28:12.093Z"
+  },
+  {
+    "id": "942a723f-dfea-4bb6-a953-1097ffb25054",
+    "organizationId": "23ca431e-f018-44dc-b1ae-0253383f083d",
+    "companyId": "f730b8d3-8806-4696-bce5-2de91eda8172",
+    "actionType": "CREATE_CONTACT",
+    "fieldPath": "firstName",
+    "originalValue": "Marcus",
+    "correctedValue": "Marc",
+    "correctedById": "043d6b57-ba35-4fde-8bb7-d31430cccb89",
+    "createdAt": "2026-08-05T18:28:12.093Z"
+  }
+]

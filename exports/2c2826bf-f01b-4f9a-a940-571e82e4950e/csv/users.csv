@@ -1,0 +1,3 @@
+id,organizationId,email,name,role,teamId,createdAt,updatedAt
+c4e1c60b-0af3-40ca-ace1-14a67b7412f7,d9f4cdcc-7391-4ec2-9c51-e3511ccfd0ed,alex@continuum.test,Alex Rivera,ADMIN,09083a9b-0831-40c9-94a9-f94311eba9e0,2026-08-06T05:46:39.581Z,2026-08-06T05:46:39.581Z
+fd05f565-a0be-42fb-a06b-c7d282b410d6,d9f4cdcc-7391-4ec2-9c51-e3511ccfd0ed,sam@continuum.test,Sam Okafor,MEMBER,09083a9b-0831-40c9-94a9-f94311eba9e0,2026-08-06T05:46:39.650Z,2026-08-06T05:46:39.650Z

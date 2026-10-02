@@ -1,0 +1,3 @@
+id,organizationId,companyId,actionType,fieldPath,originalValue,correctedValue,correctedById,createdAt
+573b2043-c601-428f-b242-34902703c260,e0b5fef4-063a-4d0b-ac04-3c2e2b4db469,ac1ce0d0-639c-4572-ac26-4d3e32af3267,CREATE_CONTACT,title,null,Head of Security,b25797c8-729f-41bb-b332-a049a440724e,2026-08-04T05:51:55.137Z
+553892b8-2662-4219-874d-e5a9edf0ee6d,e0b5fef4-063a-4d0b-ac04-3c2e2b4db469,ac1ce0d0-639c-4572-ac26-4d3e32af3267,CREATE_CONTACT,firstName,Marcus,Marc,b25797c8-729f-41bb-b332-a049a440724e,2026-08-04T05:51:55.137Z

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "491d55a4-9664-4b35-82d6-73415b4ad9b9",
+    "organizationId": "bd42b417-4f3b-4f9a-be59-5e3112a6b8d4",
+    "userId": "6335de5a-fb71-47ce-811b-7070d2784642",
+    "type": "DEAL_STALLING",
+    "title": "Meridian Freight — regional rollout has gone quiet",
+    "body": "No captured activity in 5 days.",
+    "entityType": "DEAL",
+    "entityId": "70e3062a-6378-4fbb-ada4-7efafc5953a0",
+    "readAt": null,
+    "createdAt": "2026-08-04T05:50:04.399Z"
+  },
+  {
+    "id": "38d0bd0f-d8e1-4d82-b54c-4a74491ba1b4",
+    "organizationId": "bd42b417-4f3b-4f9a-be59-5e3112a6b8d4",
+    "userId": "77255839-f9b4-4318-94b2-a548ee727add",
+    "type": "AGENT_ACTION_PENDING",
+    "title": "Add marcus.bell@northwind-logistics.com as a contact?",
+    "body": "marcus.bell@northwind-logistics.com took part in this thread and their domain belongs to a company already in the CRM, but there is no contact for them yet.",
+    "entityType": "CONTACT",
+    "entityId": null,
+    "readAt": null,
+    "createdAt": "2026-08-04T05:50:04.837Z"
+  },
+  {
+    "id": "077e6a28-1c9f-4979-b7bb-76b2a447cad1",
+    "organizationId": "bd42b417-4f3b-4f9a-be59-5e3112a6b8d4",
+    "userId": "6335de5a-fb71-47ce-811b-7070d2784642",
+    "type": "AGENT_ACTION_PENDING",
+    "title": "Move this deal to Proposal?",
+    "body": "The message states: \"budget is approved\".",
+    "entityType": "DEAL",
+    "entityId": "2b440ce8-5f4a-4d41-bf55-20c7b99f14ab",
+    "readAt": null,
+    "createdAt": "2026-08-04T05:50:04.977Z"
+  }
+]

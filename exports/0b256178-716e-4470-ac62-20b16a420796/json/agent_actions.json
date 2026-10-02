@@ -1,0 +1,24 @@
+[
+  {
+    "id": "91701705-d1aa-4178-8d44-cb7776147be4",
+    "organizationId": "1735312d-5053-43c6-a4e8-5d5768478cab",
+    "type": "CHANGE_DEAL_STAGE",
+    "status": "CONFIRMED",
+    "targetEntityType": "DEAL",
+    "targetEntityId": "7424925e-f0f8-4a3d-806b-af1407803a6b",
+    "proposedPayload": {
+      "stageName": "Proposal"
+    },
+    "appliedPayload": {
+      "stageName": "Proposal"
+    },
+    "confidenceScore": 0.9,
+    "tier": "HIGH",
+    "rationale": "The message states: \"budget is approved\". Stage proposals never advance more than one stage at a time.",
+    "sourceActivityId": "772b5bba-fc95-45ad-81e7-1e644202e620",
+    "reviewedByUserId": "726ef515-835d-4e86-8f2a-3ddec03ab349",
+    "reviewedAt": "2026-08-05T17:39:52.717Z",
+    "failureReason": null,
+    "createdAt": "2026-08-05T17:39:52.400Z"
+  }
+]

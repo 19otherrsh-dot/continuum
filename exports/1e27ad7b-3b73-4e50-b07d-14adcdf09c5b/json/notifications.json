@@ -1,0 +1,26 @@
+[
+  {
+    "id": "427038db-0c30-48b5-baf9-7ca5770d4b1c",
+    "organizationId": "218c4b68-987e-4ad1-92b4-396dd7539a4d",
+    "userId": "ec9cbb16-0dd1-4af2-adc0-79987d239baa",
+    "type": "AGENT_ACTION_PENDING",
+    "title": "Add marcus.bell@northwind-logistics.com as a contact?",
+    "body": "marcus.bell@northwind-logistics.com took part in this thread and their domain belongs to a company already in the CRM, but there is no contact for them yet.",
+    "entityType": "CONTACT",
+    "entityId": null,
+    "readAt": null,
+    "createdAt": "2026-08-04T05:40:29.553Z"
+  },
+  {
+    "id": "1396c640-520b-4f7d-beee-174ba2614f08",
+    "organizationId": "218c4b68-987e-4ad1-92b4-396dd7539a4d",
+    "userId": "2504598c-f771-4fbe-9ae2-56abf32212cd",
+    "type": "AGENT_ACTION_PENDING",
+    "title": "Move this deal to Proposal?",
+    "body": "The message states: \"budget is approved\".",
+    "entityType": "DEAL",
+    "entityId": "e28f0cdb-777a-4d76-bde0-e152d0a03225",
+    "readAt": null,
+    "createdAt": "2026-08-04T05:40:29.657Z"
+  }
+]

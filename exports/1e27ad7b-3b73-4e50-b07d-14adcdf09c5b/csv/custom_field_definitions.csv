@@ -1,0 +1,2 @@
+id,organizationId,entityType,key,label,type,options,archivedAt,createdAt
+bfdec73c-25a5-4d05-ae45-289f850cd74e,218c4b68-987e-4ad1-92b4-396dd7539a4d,DEAL,procurement_route,Procurement route,SELECT,"[""Direct"",""Reseller"",""Marketplace""]",,2026-08-04T05:40:15.345Z
